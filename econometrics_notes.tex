@@ -1,0 +1,1904 @@
+% =============================================================================
+% ECONOMETRICS LECTURE NOTES — Cumulative LaTeX File
+% =============================================================================
+%
+% ---- PROGRESS MAP ----
+% Batches processed:
+%   Batch 1 — filenames: [img1.jpg ... img5.jpg] (pages 1-5)
+%             Summary: Lecture recap dated 20 Jan 2026 — OLS method of
+%             estimation, assumptions, deriving OLS estimators via method
+%             of moments, and proof of unbiasedness of \hat{\beta}_1.
+%   Batch 2 — filenames: [page6.png ... page10.png] (pages 6-10)
+%             Summary: Alternative OLS derivation (least squares / differential
+%             calculus), variance of OLS estimators, algebraic properties,
+%             SST/SSE/SSR decomposition, R^2, regression through origin,
+%             causal inference, and omitted variable bias. New lecture
+%             date 29 Jan 2026 starts at Section 2.
+%   Batch 3 — filenames: [page10.png ... page16.png] (pages 10-16)
+%             Summary: Identification problem, binary variables and treatment
+%             framework, selection bias and randomisation, ATE and
+%             counterfactual, methods for valid counterfactual groups
+%             (RCT, DID, PSM, RDD), DID derivation, estimating error
+%             variance (\hat{\sigma}^2 = SSR/(n-2)), residuals vs errors.
+%
+% Last processed location:
+%   Page 16 — derivation of \hat{u}_i = u_i - (\hat{\beta}_0-\beta_0) -
+%   (\hat{\beta}_1-\beta_1)x_i and sample average form, continued to bottom
+%   of page (Eq.(3) in handwritten notes, our Eq.(22)).
+%
+% Ordering inferences:
+%   [UNCERTAIN ORDERING — best guess] Images uploaded in correct page order
+%   based on derivation continuity (equations flow (1)→(2)→...→(6) and the
+%   unbiasedness proof follows the estimator derivation without gaps).
+%
+% Flagged uncertainties:
+%   1. Batch1/img1 — "V(\bar{X}) < V(\hat{X}')" — accent on alternative
+%      estimator symbol is unclear. Best guess: \tilde{X} or \hat{X}'.
+%      ACTION REQUIRED: verify.
+%   2. Batch1/img1 — struck-through word before "autocorrelation" is
+%      partially illegible. Best guess: "heteroscedasticity" (crossed out).
+%      ACTION REQUIRED: verify.
+%   3. Batch1/img5 — expression "\hat{\beta}_1 = \beta_1 + \frac{1}{n}
+%      \sum(x_i - \bar{x})u_i" may be missing denominator carried from
+%      previous page. Transcribed as fraction with denominator based on
+%      mathematical context. ACTION REQUIRED: verify against original.
+%
+% ---- CHANGE LOG ----
+% Batch 1 (initial):
+%   - Transcribed 5 pages of Lecture 1 recap (20 Jan 2026).
+%   - Added explanations (Intuition, Step-by-step, Examples, Assumptions,
+%     Pitfalls) after each major derivation block.
+%   - Recreated hand-drawn PRF diagram (TikZ).
+%   - Created cumulative symbol glossary.
+%   - Flagged 3 uncertain items (see above).
+%
+% Reformatted (Batch 1):
+%   - Converted verbatim transcription style into polished lecture-note
+%     format: removed image references, arrow connectors, and choppy
+%     bullet-point style. Replaced with flowing prose and proper
+%     typographic structure. All notation, equations, and numbering
+%     preserved exactly.
+%
+% Batch 2:
+%   - Transcribed pages 6-10 (via vision reading of handwritten notes).
+%   - Added Sections 1.7-1.12 and Section 2 (2.1-2.2).
+%   - Equations (10)-(16) added. Equation numbering continues from Batch 1.
+%   - Updated cumulative symbol glossary with new symbols.
+%   - Page 6 top half already covered in Batch 1; new content starts
+%     at Method 2 (differential calculus derivation).
+%
+% Batch 3:
+%   - Transcribed pages 10-16 (via vision reading of handwritten notes).
+%   - Extended Section 2 (OVB → identification problem, binary variables,
+%     treatment framework, selection bias, ATE, counterfactual, DID).
+%   - Added Section 3 (error variance estimation).
+%   - Equations (17)-(22) added.
+%   - Removed lecture dates and lecture numbers per user request.
+%   - Updated cumulative symbol glossary.
+%
+% ---- ACTION REQUIRED ----
+%   1. Confirm: is the alternative-estimator symbol in the MVUE line
+%      \tilde{X} or \hat{X}' or something else?
+%   2. Confirm: is the struck-through word before "autocorrelation"
+%      "heteroscedasticity"?
+%   3. Confirm: does Eq.(8) carry a denominator
+%      \sum(x_i-\bar{x})^2 as shown, matching the bottom of img4?
+%
+% ---- VERIFICATION NOTES (Batch 2, pages 6-10) ----
+%   All derivations cross-checked against handwritten notes.
+%   Result: ALL EQUATIONS MATCH. No mathematical errors found.
+%
+%   Minor differences (not errors):
+%   V1. Algebraic property 4 (Section 1.9): Our notes state the result
+%       \sum\hat{y}_i\hat{u}_i = 0, while the handwritten notes state
+%       the residual definition \hat{u}_i = y_i - \hat{y}_i as property 4.
+%       Both are correct; our version is a standard OLS property derived
+%       from properties 1 and 2. The handwritten version transitions from
+%       the definition into the SST decomposition.
+%   V2. Omitted variables list (Section 2.2): We added "innate ability"
+%       to the list of omitted factors, which is not explicitly in the
+%       handwritten notes but is a standard example. The handwritten
+%       "social markup" was interpreted as "social background."
+%   V3. The handwritten notes on page 10 contain a side annotation that
+%       appears to read "\beta_{xy} = 0" or "\rho_{xy} = 0" next to the
+%       Cov(x,u) = 0 condition. This was not included as it was unclear;
+%       the main text fully captures the substance.
+%
+% ---- VERIFICATION NOTES (Batch 3, pages 10-16) ----
+%   All derivations cross-checked against handwritten notes.
+%   Result: ALL EQUATIONS MATCH. No mathematical errors found.
+%
+%   Observations:
+%   V4. DID model (page 13-14): The handwritten notes label the model
+%       as yi = β₀ + β₁Tc + β₂Gi + γTi×Gi + ui, using "Tc" and "Ti"
+%       seemingly interchangeably for the time variable. We standardised
+%       to Ti throughout (Eq.(17)).
+%   V5. DID conditional expectation (2) on page 14: The handwritten
+%       subscript in E(yi|Ti=1,Gi=0) = β₀ + β_ could be read as either
+%       β₁ or β₂. Mathematically it must be β₀+β₁ for the DID algebra
+%       to yield D₁=β₂+γ (as shown in the handwritten notes). We used
+%       β₀+β₁ (mathematically correct).
+%   V6. Error variance (page 15-16): All derivations match. The
+%       handwritten notes correctly show E(1/n Σûi²) ≠ σ² (biased)
+%       and E(1/(n-2) Σûi²) = σ² (unbiased).
+%   V7. The handwritten E(ûi)=0 proof on page 16 matches our Eq.(21)
+%       derivation exactly.
+% =============================================================================
+
+\documentclass[12pt, a4paper]{article}
+
+% ---- Packages ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing, arrows.meta, calc}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{longtable}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable, skins}
+
+% ---- Custom environments ----
+\newtheorem{definition}{Definition}[section]
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+
+% Explanation box
+\newtcolorbox{explain}[1][]{%
+  colback=blue!3, colframe=blue!40!black, fonttitle=\bfseries,
+  title=#1, breakable, enhanced}
+
+% Pitfall box
+\newtcolorbox{pitfall}[1][]{%
+  colback=red!3, colframe=red!50!black, fonttitle=\bfseries,
+  title=#1, breakable, enhanced}
+
+% Worked-example box
+\newtcolorbox{workedexample}[1][]{%
+  colback=green!3, colframe=green!40!black, fonttitle=\bfseries,
+  title=#1, breakable, enhanced}
+
+% ---- Title ----
+\title{\textbf{Econometrics Lecture Notes}\\[4pt]
+\large Ordinary Least Squares --- Method of Estimation}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section{Ordinary Least Squares --- Method of Estimation}
+\label{sec:ols-recap}
+% =====================================================================
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, title=\textbf{Key Symbols in This Section}]
+\begin{tabular}{@{}ll@{}}
+$\theta$            & Unknown population parameter \\
+$\bar{X}$           & Sample mean \\
+$\hat{\beta}_0,\;\hat{\beta}_1$ & OLS estimators of intercept and slope \\
+$\beta_0,\;\beta_1$ & True (population) intercept and slope \\
+$u_i$               & Error / disturbance term for observation $i$ \\
+$x_i,\;y_i$         & Observed values of regressor and regressand \\
+$\bar{x},\;\bar{y}$ & Sample means of $x$ and $y$ \\
+$\sigma^2$          & Variance of the error term \\
+$n$                 & Sample size \\
+\end{tabular}
+\end{tcolorbox}
+
+% ------------------------------------------------------------------
+\subsection{From Population to Sample}
+\label{subsec:pop-to-sample}
+% ------------------------------------------------------------------
+
+In econometrics we begin with a \textbf{population} whose distribution
+depends on an unknown parameter~$\theta$. Since observing the entire
+population is rarely possible, we draw a \textbf{sample} and compute a
+\textbf{sample statistic}---for example, the sample mean~$\bar{X}$.
+The goal is to use $\bar{X}$ to draw an inference about~$\theta$.
+
+A good estimator satisfies three desirable properties:
+
+\begin{enumerate}
+  \item \textbf{Unbiasedness.}
+  \begin{equation}\label{eq:unbiased-def}
+    E(\bar{X}) = \theta
+  \end{equation}
+  On average across many samples, the estimator hits the true value---no
+  systematic over- or under-estimation.
+
+  \item \textbf{Consistency.}
+  \begin{equation}\label{eq:consistent-def}
+    \operatorname{plim}_{n\to\infty} \bar{X} = \theta
+  \end{equation}
+  As the sample size grows, the estimator converges in probability to
+  the true parameter.
+
+  \item \textbf{Efficiency (MVUE).}
+  \begin{equation}\label{eq:mvue-def}
+    V(\bar{X}) < V(\tilde{X})
+    %% [UNCLEAR — best guess: \tilde{X}; Alt: \hat{X}'. ACTION REQUIRED: verify.]
+  \end{equation}
+  Among \emph{all} unbiased estimators, $\bar{X}$ has the smallest
+  variance. This is the \textbf{Minimum Variance Unbiased Estimator}
+  (MVUE), also called the \textbf{Best} estimator.
+\end{enumerate}
+
+\noindent Our objective is to show that the OLS estimators
+$\hat{\beta}_0$ and $\hat{\beta}_1$ of the bivariate regression model
+satisfy these properties.
+
+\begin{explain}[Intuition]
+We have some unknown truth about a population (captured by $\theta$).
+We cannot observe the whole population, so we take a \emph{sample} and
+compute a statistic (here $\bar{X}$). A good estimator should be:
+\begin{enumerate}
+  \item \textbf{Unbiased}: on average across many samples it hits the true value.
+  \item \textbf{Consistent}: as we collect more data it converges to the truth.
+  \item \textbf{Efficient (MVUE)}: among all unbiased estimators it has the
+        smallest spread (variance) --- the ``best'' one.
+\end{enumerate}
+We want the OLS estimators $\hat{\beta}_0$ and $\hat{\beta}_1$ to satisfy
+all three.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:unbiased-def}}: If the expected value of the
+        sample mean equals the population parameter, the estimator is
+        \emph{unbiased} --- no systematic over- or under-estimation.
+  \item \textbf{Eq.\,\eqref{eq:consistent-def}}: As $n\to\infty$, the
+        probability limit of $\bar{X}$ equals $\theta$. Large samples
+        ``wash out'' randomness.
+  \item \textbf{Eq.\,\eqref{eq:mvue-def}}: Among \emph{all} unbiased
+        estimators, $\bar{X}$ has the smallest variance --- it is the most
+        precise. This makes it the ``best'' (in the MVUE / BLUE sense).
+\end{enumerate}
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Assumptions of OLS}
+\label{subsec:ols-assumptions}
+% ------------------------------------------------------------------
+
+The following six assumptions underpin the classical bivariate OLS model.
+
+\begin{assumption}[Linear in parameters]\label{as:linear}
+  The population model is $y_i = \beta_0 + \beta_1 x_i + u_i$.
+\end{assumption}
+
+\begin{assumption}[Random sampling]\label{as:random}
+  $\{(x_i, y_i) : i = 1, 2, \dots, n\}$ is a random sample from the
+  population.
+\end{assumption}
+
+\begin{assumption}[Zero conditional mean]\label{as:zcm}
+  $E(u \mid x) = 0$.
+\end{assumption}
+
+\begin{assumption}[Homoskedasticity]\label{as:homo}
+  $V(u \mid x) = \sigma^2 < \infty$.
+\end{assumption}
+
+\begin{assumption}[No correlation between regressor and error]\label{as:nocov}
+  $\operatorname{Cov}(x, u) = 0$.
+\end{assumption}
+
+\begin{assumption}[Variation in $x$]\label{as:variation}
+  There exists some variation in $x_i$, \; $i = 1, 2, \dots, n$.
+  (i.e.\ not all $x_i$ are identical.)
+\end{assumption}
+
+\medskip
+\noindent\textbf{Remark.}\;
+These results hold even without perfect multicollinearity and
+autocorrelation.
+%% [UNCLEAR — the original notes appear to have "heteroscedasticity"
+%% struck through and replaced by "autocorrelation". ACTION REQUIRED: verify.]
+
+\medskip
+\noindent From Assumption~\ref{as:zcm}, $E(u\mid x)=0$, we can derive the
+\textbf{Population Regression Function (PRF)}, as shown in the next
+subsection.
+
+\begin{explain}[Intuition --- OLS Assumptions]
+Think of these six conditions as the ``rules of the game.'' If they hold,
+OLS gives you the best (most precise, unbiased) straight-line fit.
+\begin{itemize}
+  \item \textbf{A\ref{as:linear}}: The relationship is a straight line
+        (in parameters, not necessarily in $x$).
+  \item \textbf{A\ref{as:random}}: Every data point is drawn independently
+        from the same population.
+  \item \textbf{A\ref{as:zcm}}: Knowing $x$ tells you nothing about the
+        average error --- the error is ``mean-zero'' regardless of $x$.
+  \item \textbf{A\ref{as:homo}}: The spread of the error is the same for
+        every value of $x$ (constant variance).
+  \item \textbf{A\ref{as:nocov}}: The regressor and the error are
+        uncorrelated --- $x$ is ``clean.''
+  \item \textbf{A\ref{as:variation}}: There is actual spread in your $x$
+        data; otherwise you cannot estimate a slope.
+\end{itemize}
+\end{explain}
+
+\begin{explain}[Assumptions used]
+  All six assumptions listed above (A\ref{as:linear}--A\ref{as:variation})
+  are the classical OLS assumptions for the bivariate model. Assumptions
+  \ref{as:linear}--\ref{as:zcm} suffice for unbiasedness; adding
+  \ref{as:homo} yields the Gauss--Markov result (BLUE).
+\end{explain}
+
+\begin{pitfall}[Common pitfalls / sanity checks]
+\begin{itemize}
+  \item $E(u\mid x)=0$ is \emph{stronger} than $\operatorname{Cov}(x,u)=0$.
+        The former implies the latter, but not vice versa.
+  \item ``Linear in parameters'' does \emph{not} mean the relationship
+        between $y$ and $x$ looks like a straight line on a scatter plot.
+        $y = \beta_0 + \beta_1 x^2 + u$ is still linear in parameters.
+  \item If all $x_i$ are equal, $\operatorname{Var}(x) = 0$ and you
+        cannot divide by it --- the OLS formula breaks.
+\end{itemize}
+\end{pitfall}
+
+% ------------------------------------------------------------------
+\subsection{The Bivariate OLS Model and the Population Regression Function}
+\label{subsec:model-prf}
+% ------------------------------------------------------------------
+
+Consider the bivariate regression model:
+\begin{equation}\label{eq:model}
+  y_i = \beta_0 + \beta_1 x_i + u_i \tag{1}
+\end{equation}
+
+Here $y_i$ is the dependent (endogenous) variable, $x_i$ is the observed
+regressor (e.g.\ years of education), and $u_i$ is the stochastic error
+term capturing all other factors that affect $y_i$. Note that $y$ and $u$
+are random, while $x$ is treated as given (exogenous, non-random).
+
+Taking the conditional expectation of both sides and applying
+Assumption~\ref{as:zcm} ($E(u_i \mid x_i) = 0$), we obtain:
+\begin{equation}\label{eq:prf}
+  E(y_i \mid x_i) = \beta_0 + \beta_1 x_i
+\end{equation}
+This is the \textbf{Population Regression Function (PRF)}.
+
+\medskip
+\noindent Two important observations follow:
+\begin{enumerate}[label=\roman*)]
+  \item $E(y_i \mid x = x_i)$ is a linear function of $x$. A one-unit
+        change in $x$ changes the conditional expected value of $y$ by
+        exactly $\beta_1$ units.
+  \item For any given value of $x_i$, the distribution of $y_i$ is centred
+        about $E(y_i \mid x = x_i)$.
+\end{enumerate}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=0.9]
+  % Axes
+  \draw[->, thick] (-0.5,0) -- (8.5,0) node[right]{$x$};
+  \draw[->, thick] (0,-0.5) -- (0,6) node[above]{$E(y\mid x)$};
+
+  % PRF line
+  \draw[blue, very thick] (0.5,1) -- (7.5,5)
+    node[right, black]{\small $E(y\mid x) = \beta_0 + \beta_1 x$};
+
+  % Points on the line
+  \foreach \xval/\yval/\lab in {2/1.86/x_1, 4/3/x_2, 6/4.12/x_3} {
+    \filldraw[blue] (\xval,\yval) circle (2pt);
+    \node[below] at (\xval,0) {$\lab$};
+    \draw[dashed, gray] (\xval,0) -- (\xval,\yval);
+    % Bell curve (distribution of y_i around E(y|x_i))
+    \begin{scope}[shift={(\xval,\yval)}, rotate=90]
+      \draw[red!70!black, thick] plot[domain=-1.2:1.2, samples=40]
+        ({\x},{0.6*exp(-2*\x*\x)});
+    \end{scope}
+  }
+\end{tikzpicture}
+\caption{Population Regression Function: for each $x_i$, the distribution
+  of $y_i$ (shown in red) is centred on $E(y_i\mid x_i)$ along the blue
+  PRF line.}
+\label{fig:prf}
+\end{figure}
+
+\begin{explain}[Intuition --- PRF]
+The PRF is the ``true'' average relationship between $x$ and $y$ in the
+population. At every value of $x$, the actual $y$ values are scattered
+around this line --- the scatter is the error $u_i$. OLS tries to
+\emph{estimate} this line from sample data.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:model}}: The data-generating process.
+        Each observation $y_i$ is the sum of a systematic part
+        ($\beta_0 + \beta_1 x_i$) and a random part ($u_i$).
+  \item \textbf{Eq.\,\eqref{eq:prf}}: Taking the conditional expectation
+        and using $E(u_i\mid x_i)=0$ (Assumption~\ref{as:zcm})
+        eliminates $u_i$, leaving the PRF.
+  \item \textbf{Observation~(i)}: $\beta_1$ is the \emph{marginal effect}
+        of $x$ on $E(y\mid x)$.
+  \item \textbf{Observation~(ii)}: The distribution of $y_i$ at any $x_i$
+        is symmetric around the PRF (see Figure~\ref{fig:prf}).
+\end{enumerate}
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Estimation Strategy: Method of Moments}
+\label{subsec:two-methods}
+% ------------------------------------------------------------------
+
+Given the model in Eq.\,\eqref{eq:model} and a random sample
+$\{(x_i, y_i) : i = 1, 2, \dots, n\}$, our objective is to obtain
+estimators $\hat{\beta}_0$ and $\hat{\beta}_1$. There are two standard
+approaches:
+\begin{enumerate}
+  \item \textbf{Method of moments} (used here).
+  \item \textbf{Method of fitted values} (minimising the sum of squared
+        residuals via differential calculus).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{The key idea.}\;
+Suppose a population parameter can be expressed as $\theta = f(\mu)$,
+where $\mu$ is the population mean. The sample counterpart of $\mu$ is the
+sample mean~$\bar{y}$. If $\bar{y}$ is unbiased for $\mu$ (i.e.\
+$E(\bar{y}) = \mu$) and consistent
+($\operatorname{plim}_{n\to\infty} \bar{y} = \mu$), then we replace $\mu$
+with $\bar{y}$ to get the estimator $\hat{\theta} = f(\bar{y})$.
+
+When $f$ is a linear function, this immediately gives
+$E(f(\bar{y})) = \theta$, so the estimator is unbiased. This is the
+\textbf{method of moments}.
+
+\begin{explain}[Intuition --- Method of Moments]
+The idea is beautifully simple: if a population parameter can be written as a
+function of population means (moments), then estimate it by plugging in
+\emph{sample} means. If the sample mean is unbiased for the population mean,
+and the function is linear, the resulting estimator is also unbiased.
+That is the \textbf{method of moments} in one sentence.
+\end{explain}
+
+\begin{workedexample}[Simple special case]
+\textbf{Estimating a population mean.}\\
+Population parameter: $\theta = \mu$ (the mean). The function is just
+$f(\mu) = \mu$ (identity). Replace $\mu$ with $\bar{y}$:
+\[
+  \hat{\theta} = f(\bar{y}) = \bar{y}.
+\]
+Since $E(\bar{y}) = \mu = \theta$, the estimator is unbiased. Done!
+\end{workedexample}
+
+% ------------------------------------------------------------------
+\subsection{Deriving the OLS Estimators via Method of Moments}
+\label{subsec:ols-derivation}
+% ------------------------------------------------------------------
+
+We now apply the method of moments to Eq.\,\eqref{eq:model}:
+$y_i = \beta_0 + \beta_1 x_i + u_i$.
+
+\medskip
+\noindent\textbf{Population moment conditions.}\;
+From $E(u_i \mid x = x_i) = 0$, we have:
+\begin{equation}\label{eq:moment1-pop}
+  E\!\left(y_i - \beta_0 - \beta_1 x_i\right) = 0 \tag{2}
+\end{equation}
+
+From $\operatorname{Cov}(u_i, x_i) = 0$, which implies $E(u_i\, x_i) = 0$:
+\begin{equation}\label{eq:moment2-pop}
+  E\!\left(x_i\!\left(y_i - \beta_0 - \beta_1 x_i\right)\right) = 0
+  \tag{3}
+\end{equation}
+
+If the sample projection onto the population is correct, then
+$E(\hat{\beta}_0) = \beta_0$ and $E(\hat{\beta}_1) = \beta_1$ (unbiasedness),
+and both estimators are consistent.
+
+\medskip
+\noindent\textbf{Sample moment conditions.}\;
+Replacing the population expectations in
+\eqref{eq:moment1-pop} and \eqref{eq:moment2-pop} with sample averages:
+\begin{equation}\label{eq:moment1-sample}
+  \frac{1}{n}\sum_{i=1}^{n}\!\left(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i\right) = 0
+  \tag{4}
+\end{equation}
+\begin{equation}\label{eq:moment2-sample}
+  \frac{1}{n}\sum_{i=1}^{n}
+  x_i\!\left(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i\right) = 0
+  \tag{5}
+\end{equation}
+
+\medskip
+\noindent\textbf{Solving for $\hat{\beta}_0$.}\;
+Simplifying Eq.\,\eqref{eq:moment1-sample}:
+\[
+  \bar{y} - \hat{\beta}_0 - \hat{\beta}_1\,\bar{x} = 0
+\]
+\begin{equation}\label{eq:beta0-hat}
+  \boxed{\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\,\bar{x}}
+  \tag{6}
+\end{equation}
+This tells us that the OLS regression line always passes through the
+point of sample means $(\bar{x},\,\bar{y})$.
+
+\medskip
+\noindent\textbf{Solving for $\hat{\beta}_1$.}\;
+Expanding Eq.\,\eqref{eq:moment2-sample}:
+\[
+  \frac{1}{n}\sum_{i=1}^{n}
+  \!\left(x_i y_i - \hat{\beta}_0\, x_i - \hat{\beta}_1\, x_i^2\right) = 0
+\]
+\[
+  \frac{1}{n}\sum x_i y_i
+  \;-\; \hat{\beta}_0\,\bar{x}
+  \;-\; \hat{\beta}_1 \frac{1}{n}\sum x_i^2 = 0
+\]
+
+Substituting the expression for $\hat{\beta}_0$
+from Eq.\,\eqref{eq:beta0-hat}:
+\[
+  \frac{1}{n}\sum x_i y_i
+  = \left(\bar{y} - \hat{\beta}_1\,\bar{x}\right)\bar{x}
+  + \hat{\beta}_1\,\frac{1}{n}\sum x_i^2
+\]
+\[
+  \frac{1}{n}\sum x_i y_i
+  = \bar{x}\,\bar{y} - \hat{\beta}_1\,(\bar{x})^2
+  + \hat{\beta}_1\,\frac{1}{n}\sum x_i^2
+\]
+
+Rearranging and collecting $\hat{\beta}_1$ terms:
+\[
+  \frac{1}{n}\sum x_i y_i - \bar{x}\,\bar{y}
+  = \hat{\beta}_1\!\left(\frac{1}{n}\sum x_i^2 - (\bar{x})^2\right)
+\]
+
+The left-hand side is the sample covariance
+$\widehat{\operatorname{Cov}}(x,y)$ and the term in parentheses on the
+right is the sample variance $\widehat{\operatorname{Var}}(x)$, so:
+\[
+  \widehat{\operatorname{Cov}}(x,y)
+  = \hat{\beta}_1 \cdot \widehat{\operatorname{Var}}(x)
+\]
+
+Solving for $\hat{\beta}_1$:
+\begin{equation}\label{eq:beta1-hat}
+  \boxed{
+  \hat{\beta}_1
+  = \frac{\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}%
+         {\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  = \frac{\widehat{\operatorname{Cov}}(x,y)}{\widehat{\operatorname{Var}}(x)}
+  = \frac{S_{xy}}{S_{xx}}
+  }
+  \tag{7}
+\end{equation}
+
+where
+$\widehat{\operatorname{Var}}(x) = \dfrac{1}{n}\sum_{i=1}^{n}(x_i-\bar{x})^2$.
+
+\begin{explain}[Intuition --- OLS Estimators]
+\textbf{$\hat{\beta}_1$} (the slope) is just the sample covariance of $x$
+and $y$ divided by the sample variance of $x$. If $x$ and $y$ move together
+(positive covariance), the slope is positive; if they move oppositely, it is
+negative.
+
+\textbf{$\hat{\beta}_0$} (the intercept) adjusts the line so that the
+regression line passes through the point of means $(\bar{x},\bar{y})$.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,(2)}: The population moment condition from
+        $E(u_i)=0$. In the sample, replace the expectation with an average.
+  \item \textbf{Eq.\,(3)}: The population moment condition from
+        $\operatorname{Cov}(x,u)=0$, i.e.\ $E(x_i u_i)=0$.
+  \item \textbf{Eq.\,(4)}: Sample analog of (2). Dividing through by $n$
+        gives $\bar{y} - \hat{\beta}_0 - \hat{\beta}_1\bar{x} = 0$.
+  \item \textbf{Eq.\,(5)}: Sample analog of (3).
+  \item \textbf{Eq.\,(6)}: Solving (4) for $\hat{\beta}_0$ yields
+        $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}$. (The OLS
+        regression line passes through $(\bar{x},\bar{y})$.)
+  \item Substituting (6) into (5) and simplifying algebra yields
+        \textbf{Eq.\,(7)}: $\hat{\beta}_1 =
+        \widehat{\operatorname{Cov}}(x,y)/\widehat{\operatorname{Var}}(x)$.
+  \item \textbf{Key algebraic fact used}: $\sum(x_i - \bar{x})\bar{y} =
+        \bar{y}\sum(x_i-\bar{x}) = 0$, so $(y_i - \bar{y})$ in the
+        numerator can be replaced by just $y_i$.
+\end{enumerate}
+\end{explain}
+
+\begin{workedexample}[Tiny numerical example]
+Suppose $n=3$ with data $(x_i,y_i)$: $(1,2)$, $(2,4)$, $(3,5)$.
+\[
+  \bar{x} = 2,\quad \bar{y} = \tfrac{11}{3}\approx 3.67.
+\]
+\[
+  \widehat{\operatorname{Cov}}(x,y)
+  = \tfrac{1}{3}\bigl[(1-2)(2-3.67)+(2-2)(4-3.67)+(3-2)(5-3.67)\bigr]
+  = \tfrac{1}{3}(1.67+0+1.33) = 1.
+\]
+\[
+  \widehat{\operatorname{Var}}(x)
+  = \tfrac{1}{3}[(1-2)^2+(2-2)^2+(3-2)^2] = \tfrac{2}{3}.
+\]
+\[
+  \hat{\beta}_1 = \frac{1}{2/3} = 1.5,
+  \qquad
+  \hat{\beta}_0 = 3.67 - 1.5\times 2 = 0.67.
+\]
+So the estimated line is $\hat{y} = 0.67 + 1.5\,x$.
+\end{workedexample}
+
+\begin{explain}[Assumptions used]
+  \begin{itemize}
+    \item Assumption~\ref{as:zcm} ($E(u\mid x)=0$) gives moment
+          condition~(2).
+    \item Assumption~\ref{as:nocov} ($\operatorname{Cov}(x,u)=0$)
+          gives moment condition~(3).
+    \item Assumption~\ref{as:variation} (variation in $x$)
+          ensures $\widehat{\operatorname{Var}}(x)\neq 0$ so we
+          can divide.
+  \end{itemize}
+\end{explain}
+
+\begin{pitfall}[Common pitfalls / sanity checks]
+\begin{itemize}
+  \item The ``$1/n$'' in numerator \emph{and} denominator cancels, so you
+        can equivalently write
+        $\hat\beta_1 = \sum(x_i-\bar x)(y_i-\bar y)/\sum(x_i-\bar x)^2$.
+  \item $\hat\beta_0$ has no stand-alone meaning if the data never have
+        $x=0$. In that case interpret $\hat\beta_0$ with caution.
+  \item Double-check: the regression line \emph{always} passes through
+        $(\bar x, \bar y)$. If your line does not, you made an algebra error.
+\end{itemize}
+\end{pitfall}
+
+% ------------------------------------------------------------------
+\subsection{Proof of Unbiasedness of \texorpdfstring{$\hat{\beta}_1$}{beta-1-hat}}
+\label{subsec:unbiasedness}
+% ------------------------------------------------------------------
+
+We now prove that $\hat{\beta}_1$ is an unbiased estimator of the true
+slope $\beta_1$, i.e.\ that $E(\hat{\beta}_1) = \beta_1$.
+
+\medskip
+\noindent\textbf{Step 1: Simplify the numerator.}\;
+Observe that $\sum_{i=1}^{n}(x_i - \bar{x})\bar{y} = \bar{y}\cdot 0 = 0$,
+so $\bar{y}$ can be dropped from the numerator of $\hat{\beta}_1$:
+\begin{equation}\label{eq:beta1-alt}
+  \hat{\beta}_1
+  = \frac{\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}%
+         {\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  = \frac{\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})\,y_i}%
+         {\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\end{equation}
+
+\medskip
+\noindent\textbf{Step 2: Substitute the model.}\;
+Replacing $y_i = \beta_0 + \beta_1 x_i + u_i$:
+\begin{align}
+  \hat{\beta}_1
+  &= \frac{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})
+     (\beta_0 + \beta_1 x_i + u_i)}%
+     {\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+     \notag\\[6pt]
+  &= \frac{\frac{1}{n}\sum(x_i-\bar{x})\,\beta_0
+     + \frac{1}{n}\sum(x_i-\bar{x})\,\beta_1 x_i
+     + \frac{1}{n}\sum(x_i-\bar{x})\,u_i}%
+     {\frac{1}{n}\sum(x_i-\bar{x})^2}
+     \notag\\[6pt]
+  &= \frac{\beta_0\!\cdot\! 0
+     \;+\; \beta_1\!\cdot\!\frac{1}{n}\sum(x_i-\bar{x})x_i
+     \;+\; \frac{1}{n}\sum(x_i-\bar{x})\,u_i}%
+     {\frac{1}{n}\sum(x_i-\bar{x})^2}
+     \label{eq:expand-beta1}
+\end{align}
+The first term vanishes because $\sum(x_i - \bar{x}) = 0$.
+
+\medskip
+\noindent\textbf{Step 3: Apply the key algebraic identity.}\;
+\[
+  \frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})\,x_i
+  = \frac{1}{n}\sum x_i^2 - \bar{x}\cdot\frac{1}{n}\sum x_i
+  = \frac{1}{n}\sum x_i^2 - (\bar{x})^2
+  = \frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2
+\]
+
+This means the $\beta_1$ coefficient in the numerator matches the
+denominator exactly, so they cancel:
+\begin{align}
+  \hat{\beta}_1
+  &= \frac{\beta_1\cdot\frac{1}{n}\sum(x_i-\bar{x})^2
+     + \frac{1}{n}\sum(x_i-\bar{x})\,u_i}%
+     {\frac{1}{n}\sum(x_i-\bar{x})^2}
+     \notag\\[8pt]
+  &= \beta_1
+     + \frac{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})\,u_i}%
+            {\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+     \notag
+\end{align}
+
+\begin{equation}\label{eq:beta1-decomp}
+  \boxed{
+    \hat{\beta}_1
+    = \beta_1
+    + \frac{\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})\,u_i}%
+           {\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  }
+  \tag{8}
+\end{equation}
+
+%% [UNCLEAR — the original handwritten notes may show Eq.(8) without the
+%% denominator at the top of a page, but the denominator is carried from
+%% the previous page. The expression above is mathematically correct.
+%% ACTION REQUIRED: verify against original.]
+
+This is the fundamental decomposition: the estimator equals the true
+parameter plus a ``noise'' term.
+
+\medskip
+\noindent\textbf{Step 4: Take the expectation.}\;
+\begin{align}
+  E(\hat{\beta}_1)
+  &= \beta_1
+     + \frac{1}{\sum(x_i-\bar{x})^2}
+       \sum_{i=1}^{n} E\!\left[(x_i - \bar{x})\,u_i\right]
+     \label{eq:exp-step1}\\[6pt]
+  &= \beta_1
+     + \frac{1}{\sum(x_i-\bar{x})^2}
+       \sum_{i=1}^{n} E\!\left[(x_i - \bar{x})(u_i - \bar{u})\right]
+     \label{eq:exp-step2}
+\end{align}
+
+Since $x$ is non-random (fixed in repeated samples) and
+$E(u_i) = 0$ by Assumption~\ref{as:zcm}:
+\[
+  E\!\left[(x_i - \bar{x})\,u_i\right]
+  = (x_i - \bar{x})\,E(u_i) = 0
+\]
+
+Therefore:
+\begin{equation}\label{eq:unbiased-beta1}
+  \boxed{E(\hat{\beta}_1) = \beta_1 + 0 = \beta_1}
+  \tag{9}
+\end{equation}
+Hence $\hat{\beta}_1$ is an \textbf{unbiased} estimator of $\beta_1$.
+\hfill$\square$
+
+\bigskip
+\noindent\textbf{Remark (Sign of $\hat{\beta}_1$).}\;
+Since $\widehat{\operatorname{Var}}(x) > 0$ (guaranteed by
+Assumption~\ref{as:variation}), the sign of $\hat{\beta}_1$ is determined
+entirely by $\widehat{\operatorname{Cov}}(x,y)$:
+\[
+  \hat{\beta}_1
+  = \frac{\widehat{\operatorname{Cov}}(x,y)}{\widehat{\operatorname{Var}}(x)}
+\]
+Positive sample covariance yields a positive slope, and vice versa.
+
+\begin{explain}[Intuition --- Unbiasedness]
+Eq.\,\eqref{eq:beta1-decomp} says:\\
+\emph{``What you estimate = the truth + noise.''}\\
+The noise term involves $\sum(x_i-\bar{x})u_i$. When we take the expected
+value, the noise averages out to zero because (a)~$x$ is fixed, and
+(b)~the errors have mean zero. So on average, $\hat\beta_1$ hits $\beta_1$
+exactly. That is unbiasedness.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:beta1-alt}}: Rewrite $\hat\beta_1$ so
+        that $y_i$ appears alone (without $\bar y$) in the numerator.
+        This is valid because $\sum(x_i-\bar x)\,\bar y = 0$.
+  \item \textbf{Eq.\,\eqref{eq:expand-beta1}}: Substitute the model
+        $y_i = \beta_0 + \beta_1 x_i + u_i$ and expand.
+  \item The $\beta_0$ term vanishes because $\sum(x_i-\bar x)=0$.
+  \item The $\beta_1$ term simplifies because
+        $\sum(x_i-\bar x)x_i = \sum(x_i-\bar x)^2$ (the key algebraic
+        identity), so $\beta_1$ cancels with the denominator.
+  \item We are left with $\hat\beta_1 = \beta_1 + \text{noise}$
+        (Eq.\,\eqref{eq:beta1-decomp}).
+  \item \textbf{Eq.\,\eqref{eq:exp-step1}}: Take expectations.
+        Since $x$ is non-stochastic, $(x_i-\bar x)$ passes through $E[\cdot]$.
+  \item $E(u_i)=0$ kills the noise term, giving
+        $E(\hat\beta_1)=\beta_1$\; (Eq.\,\eqref{eq:unbiased-beta1}).
+  \item \textbf{Sign of $\hat\beta_1$}: Since $\widehat{\operatorname{Var}}(x)>0$,
+        positive covariance implies positive $\hat\beta_1$ and vice versa.
+\end{enumerate}
+\end{explain}
+
+\begin{explain}[Assumptions used]
+  \begin{itemize}
+    \item \textbf{A\ref{as:linear}} (linear model): needed to substitute
+          $y_i = \beta_0 + \beta_1 x_i + u_i$.
+    \item \textbf{A\ref{as:random}} (random sampling): ensures observations
+          are i.i.d.
+    \item \textbf{A\ref{as:zcm}} ($E(u\mid x)=0$): the critical assumption
+          that makes $E[(x_i-\bar x)u_i]=0$.
+    \item \textbf{A\ref{as:variation}} (variation in $x$): ensures denominator
+          $\neq 0$.
+  \end{itemize}
+\end{explain}
+
+\begin{pitfall}[Common pitfalls / sanity checks]
+\begin{itemize}
+  \item Unbiasedness is a \emph{repeated-sampling} property. For any
+        single sample, $\hat\beta_1$ will almost certainly not equal
+        $\beta_1$. It means the \emph{average} across all possible
+        samples equals $\beta_1$.
+  \item If $E(u\mid x)\neq 0$ (omitted variable bias, endogeneity),
+        unbiasedness fails. This is the most common way OLS goes wrong
+        in practice.
+  \item The step from Eq.\,\eqref{eq:exp-step1} to
+        Eq.\,\eqref{eq:exp-step2} uses the fact that $\bar u$ also has
+        expectation zero, so the $(u_i-\bar u)$ form is equivalent.
+        (Some textbooks skip this; the notes include it for completeness.)
+\end{itemize}
+\end{pitfall}
+
+\begin{explain}[Further reading]
+  \textit{Introductory Econometrics: A Modern Approach} by J.\,M.\,Wooldridge,
+  Chapter~2 (The Simple Regression Model) --- covers OLS derivation and
+  properties in detail.
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Alternative Derivation: Least Squares (Differential Calculus)}
+\label{subsec:ols-leastsq}
+% ------------------------------------------------------------------
+
+We now derive the same OLS estimators using an alternative approach:
+\textbf{minimising the sum of squared residuals} via differential
+calculus. This is sometimes called the \emph{method of fitted values}.
+
+\medskip
+\noindent\textbf{Setup.}\;
+From the population model \eqref{eq:model}, the fitted (estimated)
+equation is:
+\[
+  \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i
+\]
+where $\hat{y}_i$ is the predicted value of $y_i$. Note that
+$\hat{y}_i \neq y_i$ in general; the difference
+$\hat{u}_i = y_i - \hat{y}_i$ is the \textbf{residual} (not the error
+$u_i$).
+
+\medskip
+\noindent\textbf{Objective.}\;
+Choose $\hat{\beta}_0$ and $\hat{\beta}_1$ to minimise the sum of
+squared residuals:
+\begin{equation}\label{eq:ols-objective}
+  Q = \sum_{i=1}^{n} \hat{u}_i^2
+    = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+    = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2
+  \tag{10}
+\end{equation}
+
+\medskip
+\noindent\textbf{First-order conditions (FOC).}\;
+Differentiating with respect to $\hat{\beta}_0$:
+\begin{align}
+  \frac{\partial Q}{\partial \hat{\beta}_0}
+  &= -2 \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i) = 0
+  \notag\\[4pt]
+  \Longrightarrow\quad
+  \sum_{i=1}^{n} y_i - n\hat{\beta}_0
+    - \hat{\beta}_1 \sum_{i=1}^{n} x_i &= 0
+  \notag
+\end{align}
+Dividing through by $n$:
+\[
+  \bar{y} - \hat{\beta}_0 - \hat{\beta}_1\,\bar{x} = 0
+  \qquad\Longrightarrow\qquad
+  \boxed{\bar{y} = \hat{\beta}_0 + \hat{\beta}_1\,\bar{x}}
+\]
+This reproduces Eq.\,\eqref{eq:beta0-hat}. It also implies:
+
+\begin{proposition}[Sum of residuals is zero]\label{prop:resid-zero}
+  $\displaystyle\sum_{i=1}^{n}\hat{u}_i = 0$, \; equivalently
+  $\bar{\hat{u}} = 0$.
+\end{proposition}
+
+\noindent That is, the average of the residuals is zero. However,
+this does \emph{not} mean individual residuals $\hat{u}_i$ are zero ---
+they can be large and of mixed sign, but they sum to zero.
+
+\medskip
+\noindent Differentiating with respect to $\hat{\beta}_1$ gives the
+\textbf{second normal equation}:
+\[
+  \frac{\partial Q}{\partial \hat{\beta}_1}
+  = -2 \sum_{i=1}^{n} x_i(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i) = 0
+\]
+Solving this system (using
+$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}$)
+yields the same slope estimator as Eq.\,\eqref{eq:beta1-hat}:
+\[
+  \hat{\beta}_1
+  = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}%
+         {\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  = \frac{\widehat{\operatorname{Cov}}(x,y)}%
+         {\widehat{\operatorname{Var}}(x)}
+\]
+
+\noindent Both derivation methods (method of moments and least squares)
+produce identical estimators. The second-order conditions (SOC) confirm
+that this is indeed a minimum (not a maximum), which can be verified by
+checking that the Hessian matrix of $Q$ is positive definite.
+
+\begin{explain}[Intuition --- Least Squares Derivation]
+The idea behind least squares is geometric: among all possible straight
+lines you could draw through the scatter plot, OLS picks the one that
+minimises the total squared vertical distance from each data point to
+the line. The two first-order conditions (one for the intercept, one for
+the slope) define the unique line achieving this minimum.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:ols-objective}}: The objective function $Q$
+        measures total squared prediction error. We want $Q$ as small as
+        possible.
+  \item The FOC $\partial Q/\partial\hat\beta_0 = 0$ gives the first
+        normal equation. It immediately yields
+        $\hat\beta_0 = \bar y - \hat\beta_1\bar x$ (same as Eq.\,(6)).
+  \item Setting the first normal equation to zero also proves
+        $\sum\hat u_i = 0$: residuals sum to zero by construction.
+  \item The FOC $\partial Q/\partial\hat\beta_1 = 0$ gives the second
+        normal equation. Substituting $\hat\beta_0$ and simplifying
+        reproduces Eq.\,(7).
+  \item The SOC (second-order conditions) confirm a true minimum.
+\end{enumerate}
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Variance of the OLS Estimators}
+\label{subsec:ols-variance}
+% ------------------------------------------------------------------
+
+Both $\hat{\beta}_0$ and $\hat{\beta}_1$ are random variables (they vary
+from sample to sample), so each has an expectation and a variance ---
+hence a \emph{sampling distribution}. Under the classical assumptions
+(including Assumption~\ref{as:homo}, homoskedasticity), the variances
+are:
+
+\begin{equation}\label{eq:var-beta1}
+  \boxed{V(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}}
+  \tag{11}
+\end{equation}
+where $SST_x = \sum_{i=1}^{n}(x_i - \bar{x})^2$ is the total sum of
+squares of $x$.
+
+\begin{equation}\label{eq:var-beta0}
+  \boxed{V(\hat{\beta}_0)
+  = \frac{\sigma^2}{n}\cdot
+  \frac{\displaystyle\sum_{i=1}^{n} x_i^2}{SST_x}}
+  \tag{12}
+\end{equation}
+
+\noindent Under the additional assumption that the errors are normally
+distributed ($u_i \mid x \sim N(0, \sigma^2)$), the sampling
+distributions of $\hat{\beta}_0$ and $\hat{\beta}_1$ are also normal.
+
+\begin{explain}[Intuition --- Variance of $\hat{\beta}_1$]
+Three factors determine how precise $\hat\beta_1$ is:
+\begin{itemize}
+  \item \textbf{$\sigma^2$ (error variance)}: More noise in $y \Rightarrow$
+        less precise slope estimate.
+  \item \textbf{$SST_x$ (spread in $x$)}: More variation in $x \Rightarrow$
+        \emph{more} precise estimate. Intuitively, a wider range of $x$
+        values gives more ``leverage'' to pin down the slope.
+  \item \textbf{$n$ (sample size)}: Larger $n$ increases $SST_x$ (everything
+        else equal), reducing variance.
+\end{itemize}
+\end{explain}
+
+\begin{explain}[Assumptions used]
+  \begin{itemize}
+    \item Assumptions~\ref{as:linear}--\ref{as:zcm} (for unbiasedness).
+    \item Assumption~\ref{as:homo} ($V(u\mid x)=\sigma^2$): needed
+          specifically for the variance formulas
+          \eqref{eq:var-beta1}--\eqref{eq:var-beta0}.
+    \item Assumption~\ref{as:variation}: ensures $SST_x > 0$.
+  \end{itemize}
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Algebraic Properties of OLS Estimators}
+\label{subsec:ols-algebraic}
+% ------------------------------------------------------------------
+
+The following properties hold for OLS residuals and fitted values
+\textbf{by construction} (i.e.\ they follow from the first-order
+conditions, regardless of whether the model or assumptions are correct).
+
+\begin{enumerate}
+  \item \textbf{Residuals sum to zero:}
+  \[
+    \sum_{i=1}^{n} \hat{u}_i = 0
+    \qquad\Longleftrightarrow\qquad
+    \bar{\hat{u}} = 0
+  \]
+
+  \item \textbf{Residuals are uncorrelated with $x$:}
+  \[
+    \sum_{i=1}^{n} x_i\,\hat{u}_i = 0
+  \]
+
+  \item \textbf{The point of means lies on the regression line:}
+  The sample means $(\bar{x}, \bar{y})$ satisfy
+  $\bar{y} = \hat{\beta}_0 + \hat{\beta}_1\,\bar{x}$.
+
+  \item \textbf{Residuals are uncorrelated with fitted values:}
+  \[
+    \sum_{i=1}^{n} \hat{y}_i\,\hat{u}_i = 0
+  \]
+  (This follows from properties 1 and 2, since
+  $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$.)
+\end{enumerate}
+
+\begin{explain}[Intuition --- Algebraic Properties]
+These properties are not assumptions --- they are \emph{consequences} of
+how OLS is constructed. The first-order conditions force the residuals
+to behave well: they average to zero, they are orthogonal to $x$ and to
+$\hat{y}$, and the regression line passes through the ``centre of mass''
+$(\bar{x}, \bar{y})$ of the data.
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Decomposition of Variation and Goodness of Fit}
+\label{subsec:goodness-fit}
+% ------------------------------------------------------------------
+
+We can decompose the total variation in $y$ into an \emph{explained}
+part and an \emph{unexplained} (residual) part.
+
+\medskip
+\noindent\textbf{Definitions.}
+\begin{align*}
+  SST &= \sum_{i=1}^{n}(y_i - \bar{y})^2
+         &&\text{(Total Sum of Squares)} \\
+  SSE &= \sum_{i=1}^{n}(\hat{y}_i - \bar{y})^2
+         &&\text{(Explained Sum of Squares)} \\
+  SSR &= \sum_{i=1}^{n}\hat{u}_i^2
+         &&\text{(Sum of Squared Residuals)}
+\end{align*}
+
+\noindent\textbf{Decomposition.}\;
+Since $y_i - \bar{y} = (\hat{y}_i - \bar{y}) + \hat{u}_i$, squaring and
+summing gives:
+\[
+  \sum(y_i - \bar{y})^2
+  = \sum(\hat{y}_i - \bar{y})^2
+  + 2\sum(\hat{y}_i - \bar{y})\hat{u}_i
+  + \sum\hat{u}_i^2
+\]
+The cross term vanishes (since
+$\sum\hat{y}_i\,\hat{u}_i = 0$ and $\sum\hat{u}_i = 0$ by the algebraic
+properties), so:
+\begin{equation}\label{eq:sst-decomp}
+  \boxed{SST = SSE + SSR}
+  \tag{13}
+\end{equation}
+
+\medskip
+\noindent\textbf{Goodness of fit ($R^2$).}\;
+The \textbf{coefficient of determination} measures the fraction of total
+variation in $y$ that is explained by the regression:
+\begin{equation}\label{eq:r-squared}
+  \boxed{R^2 = \frac{SSE}{SST} = 1 - \frac{SSR}{SST}}
+  \tag{14}
+\end{equation}
+
+\noindent Properties of $R^2$:
+\begin{itemize}
+  \item $R^2 \in [0,\,1]$ (for a model with an intercept).
+  \item $R^2$ closer to 1 indicates a better-fitting model.
+  \item $R^2$ closer to 0 indicates a poor fit.
+  \item $R^2 = 1$ when $SSE = SST$ (equivalently $SSR = 0$): all residuals
+        are zero, so the model fits the data perfectly. This is suspicious
+        --- it may mean you are fitting the population itself, not a sample.
+  \item $R^2 = 0$ when $SSE = 0$: the model explains \emph{none} of the
+        variation in $y$; the regressor $x$ is redundant.
+  \item Both extremes ($R^2 = 0$ and $R^2 = 1$) are concerning in practice.
+\end{itemize}
+
+\begin{explain}[Intuition --- $R^2$]
+Think of $SST$ as the ``total pie'' of variation in $y$. The model
+(through $\hat{y}_i$) explains a slice $SSE$, and the residuals
+account for the rest $SSR$. $R^2$ is simply the explained share:
+$R^2 = SSE / SST$.
+
+If $R^2 = 0.7$, the model explains 70\% of the variation in $y$.
+The remaining 30\% is unexplained (captured by the residuals).
+\end{explain}
+
+\begin{pitfall}[Common pitfalls --- $R^2$]
+\begin{itemize}
+  \item A high $R^2$ does \emph{not} guarantee a correct or causal model.
+        You can have a spurious regression with $R^2$ close to 1.
+  \item $R^2 = 1$ almost never happens with real data. If it does, check
+        for errors (e.g.\ including the dependent variable on the RHS
+        in a different form).
+  \item $R^2 = 0$ means $x$ has no linear predictive power for $y$ ---
+        but this does not rule out a nonlinear relationship.
+\end{itemize}
+\end{pitfall}
+
+% ------------------------------------------------------------------
+\subsection{Regression Through the Origin --- Special Case}
+\label{subsec:origin-regression}
+% ------------------------------------------------------------------
+
+A special case arises when we impose $\beta_0 = 0$ (no intercept),
+so the model becomes:
+\[
+  y_i = \beta_1 x_i + u_i
+\]
+and the fitted equation is $\hat{y}_i = \hat{\beta}_1 x_i$.
+
+\medskip
+\noindent\textbf{Deriving the estimator.}\;
+The OLS objective is $Q = \sum_{i=1}^{n}(y_i - \hat{\beta}_1 x_i)^2$.
+Compared to the standard case, there is only \emph{one} first-order
+condition:
+\[
+  \frac{\partial Q}{\partial \hat{\beta}_1}
+  = -2\sum_{i=1}^{n} x_i(y_i - \hat{\beta}_1 x_i) = 0
+\]
+Solving:
+\begin{equation}\label{eq:beta1-origin}
+  \boxed{
+    \hat{\beta}_1\big|_{\beta_0=0}
+    = \frac{\displaystyle\sum_{i=1}^{n} x_i\, y_i}%
+           {\displaystyle\sum_{i=1}^{n} x_i^2}
+  }
+  \tag{15}
+\end{equation}
+
+\noindent\textbf{Unbiasedness.}\;
+Substituting $y_i = \beta_1 x_i + u_i$:
+\[
+  \hat{\beta}_1
+  = \frac{\sum x_i(\beta_1 x_i + u_i)}{\sum x_i^2}
+  = \beta_1 + \frac{\sum x_i\, u_i}{\sum x_i^2}
+\]
+Taking expectations: $E(\hat{\beta}_1) = \beta_1$ (since
+$E(u_i \mid x)=0$), so the origin-regression estimator is also unbiased.
+
+\medskip
+\noindent\textbf{$R^2$ in the origin regression.}\;
+For the standard model (with intercept):
+\[
+  R^2\big|_{\beta_0 \neq 0}
+  = 1 - \frac{\sum(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2}{SST}
+\]
+For the origin model (without intercept):
+\[
+  R^2\big|_{\beta_0 = 0}
+  = 1 - \frac{\sum(y_i - \hat{\beta}_1 x_i)^2}{SST}
+\]
+
+\noindent\textbf{Key issue: negative $R^2$.}\;
+Since the model with intercept always achieves a residual sum of
+squares no larger than the model without intercept (adding a free
+parameter can only improve or maintain the fit):
+\[
+  \sum(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2
+  \;\leq\;
+  \sum(y_i - \hat{\beta}_1 x_i)^2
+\]
+it follows that
+\[
+  R^2\big|_{\beta_0 \neq 0} \;\geq\; R^2\big|_{\beta_0 = 0}
+\]
+Moreover, $R^2\big|_{\beta_0 = 0}$ \emph{can be negative}, because
+$\sum(y_i - \hat{\beta}_1 x_i)^2$ may exceed
+$SST = \sum(y_i - \bar{y})^2$.
+
+\medskip
+\noindent\textbf{Remedy: uncentered $R^2$.}\;
+To obtain a goodness-of-fit measure that lies in $[0,1]$ for the
+origin regression, replace the centred $SST$ with the uncentered total
+$\sum y_i^2$:
+\begin{equation}\label{eq:r2-uncentered}
+  \bar{R}^2\big|_{\beta_0 = 0}
+  = 1 - \frac{\displaystyle\sum_{i=1}^{n}(y_i - \hat{\beta}_1 x_i)^2}%
+             {\displaystyle\sum_{i=1}^{n} y_i^2}
+  \tag{16}
+\end{equation}
+
+\begin{explain}[Intuition --- Regression Through the Origin]
+Forcing the line through $(0,0)$ removes a degree of freedom. If the
+true intercept is not zero, this constraint worsens the fit, potentially
+so much that $R^2$ drops below zero. The uncentered $\bar{R}^2$ fixes
+this by comparing the residual sum of squares to $\sum y_i^2$ instead of
+$\sum(y_i-\bar{y})^2$.
+\end{explain}
+
+\begin{pitfall}[Common pitfalls --- Regression Through the Origin]
+\begin{itemize}
+  \item The algebraic property $\sum\hat{u}_i = 0$ no longer holds in
+        general when $\beta_0 = 0$.
+  \item $R^2$ from an origin regression is \emph{not comparable} to $R^2$
+        from a standard regression. Use the uncentered $\bar{R}^2$ for
+        comparisons.
+  \item Forcing $\beta_0 = 0$ without theoretical justification can bias
+        the slope estimator if the true intercept is nonzero.
+\end{itemize}
+\end{pitfall}
+
+% =====================================================================
+\newpage
+\section{Causal Inference and Omitted Variable Bias}
+\label{sec:causal}
+% =====================================================================
+
+\noindent\textit{Reference: Wooldridge, Chapter~2 (end of chapter).}
+
+% ------------------------------------------------------------------
+\subsection{OLS and Causality}
+\label{subsec:ols-causality}
+% ------------------------------------------------------------------
+
+OLS is often used to estimate \textbf{cause-and-effect} relationships.
+For the estimated slope $\hat{\beta}_1$ to have a \emph{causal}
+interpretation, two conditions are critical:
+
+\begin{enumerate}
+  \item $E(u \mid x) = 0$ \quad (zero conditional mean),
+  \item $E(x\, u) = 0$ \quad$\Longrightarrow$\quad
+        $\operatorname{Cov}(x, u) = 0$.
+\end{enumerate}
+
+\noindent These conditions require that the variation in $x$ is not
+influenced by --- and does not influence --- the unobserved factors in
+$u$, and vice versa.
+
+\medskip
+\noindent\textbf{Example (Wage equation).}\;
+Consider the model:
+\[
+  \text{wage} = \beta_0 + \beta_1\,\text{education} + u
+\]
+For $\hat{\beta}_1$ to be the causal effect of education on wages, we
+need $\operatorname{Cov}(\text{education},\, u) = 0$. This means that
+education must be independent of the error term --- that is, none of
+the factors captured in $u$ should be correlated with education.
+
+But is this realistic? Factors such as experience, innate ability,
+parents' education, sector of employment, gender, and social background
+all affect wages \emph{and} are likely correlated with education.
+Since these variables are not in the model, they are absorbed into $u$,
+creating a correlation between education and $u$.
+
+% ------------------------------------------------------------------
+\subsection{Omitted Variable Bias}
+\label{subsec:ovb}
+% ------------------------------------------------------------------
+
+When relevant variables are excluded from the model, they become part
+of the error term $u$. If any of these omitted variables is correlated
+with the included regressor $x$, then
+$\operatorname{Cov}(x, u) \neq 0$, and the OLS estimator is
+\textbf{biased}. This phenomenon is called \textbf{omitted variable
+bias} (OVB).
+
+In the wage example, omitted factors (experience, parents' education,
+sector, gender, social background, etc.) are all included in $u$.
+If these factors are correlated with education, then
+$\operatorname{Cov}(\text{education}, u) \neq 0$, and
+$\hat{\beta}_1$ is biased for the true causal effect of education on
+wages.
+
+\begin{explain}[Intuition --- Omitted Variable Bias]
+Imagine you are trying to measure the effect of studying ($x$) on exam
+scores ($y$), but you omit ``innate ability'' from the model. Able
+students tend to study more \emph{and} score higher. OLS attributes all
+the variation in scores to studying, overstating its true effect. The
+estimator picks up the effect of ability through its correlation with
+studying --- that is the omitted variable bias.
+\end{explain}
+
+\begin{pitfall}[Common pitfalls --- Causality]
+\begin{itemize}
+  \item OLS gives the \textbf{best linear prediction}, but prediction is
+        not causation. A significant $\hat{\beta}_1$ does not prove that
+        $x$ \emph{causes} $y$.
+  \item $E(u\mid x) = 0$ is \emph{untestable} --- you cannot observe $u$.
+        It must be justified by economic reasoning and research design.
+  \item The cure for OVB is either (a)~including the omitted variable in
+        the regression (if data are available), or (b)~using instrumental
+        variables or other identification strategies.
+\end{itemize}
+\end{pitfall}
+
+\medskip
+\noindent\textbf{The identification problem.}\;
+Because many omitted variables (experience, parents' education, sector,
+gender, social background, etc.) are correlated with education, we are
+unable to identify education as the \emph{sole} factor affecting wages.
+The variable ``education'' is no longer exogenous:
+\[
+  E(u \mid x) \neq 0
+  \qquad\text{and}\qquad
+  E(x\, u) \neq 0.
+\]
+This is referred to as an \textbf{identification problem}: the causal
+effect of $x$ on $y$ cannot be separated from the confounding influence
+of the omitted factors.
+
+% ------------------------------------------------------------------
+\subsection{Binary Variables and the Treatment Framework}
+\label{subsec:binary-treatment}
+% ------------------------------------------------------------------
+
+\noindent\textbf{Making a continuous variable discrete.}\;
+In the wage--education example, education (years of schooling) is
+continuous. We can convert it to a \textbf{binary variable}:
+\[
+  e_i =
+  \begin{cases}
+    0 & \text{no schooling (illiterate) --- \emph{reference group}}, \\
+    1 & \text{schooling (literate) --- \emph{interest group}}.
+  \end{cases}
+\]
+This involves a \emph{loss of information} (we collapse many education
+levels into just two categories), but it simplifies interpretation.
+
+\medskip
+\noindent\textbf{Interpreting the binary-variable model.}\;
+The model becomes $w_i = \beta_0 + \beta_1 e_i + u_i$, where
+$e_i \in \{0, 1\}$.
+
+Taking conditional expectations (using $E(u\mid e) = 0$):
+\begin{align*}
+  E(w \mid e = 1)
+    &= \beta_0 + \beta_1 \cdot 1 + E(u\mid e=1)
+     = \beta_0 + \beta_1, \\
+  E(w \mid e = 0)
+    &= \beta_0 + \beta_1 \cdot 0 + E(u\mid e=0)
+     = \beta_0.
+\end{align*}
+Therefore:
+\[
+  E(w \mid e = 1) - E(w \mid e = 0) = \beta_1.
+\]
+That is, $\beta_1$ is the \textbf{difference in average wages between
+literate and illiterate} individuals.
+
+\begin{explain}[Intuition --- Binary Variable]
+With a binary regressor, the intercept $\beta_0$ is the average outcome
+for the reference group ($e=0$), and $\beta_1$ is the \emph{difference}
+in average outcomes between the two groups. This is exactly what you
+would get from a two-sample difference-in-means test.
+\end{explain}
+
+\medskip
+\noindent\textbf{From binary variables to treatment effects.}\;
+Causal inference is usually concerned with understanding
+\textbf{policy cause-and-effect} or \textbf{policy choice}. The
+framework is borrowed from medical science (evaluating the effectiveness
+of a treatment/medicine).
+
+We introduce a \textbf{treatment variable} $T_i$:
+\[
+  T_i =
+  \begin{cases}
+    0 & \text{not eligible / did not receive treatment}, \\
+    1 & \text{eligible / received treatment}.
+  \end{cases}
+\]
+The model becomes:
+\[
+  w_i = \beta_0 + \beta_1 T_i + u_i
+\]
+where $\beta_1$ measures the effect of treatment on the outcome.
+Everything is structurally the same as the binary-variable model above.
+
+% ------------------------------------------------------------------
+\subsection{Selection Bias and Randomisation}
+\label{subsec:selection-bias}
+% ------------------------------------------------------------------
+
+\noindent\textbf{The selection problem.}\;
+Simply comparing outcomes for $T=1$ (treated) and $T=0$ (untreated)
+is problematic. The individuals who receive treatment may differ
+systematically from those who do not. For example, more motivated
+individuals may be more likely to self-select into the treatment group.
+This leads to \textbf{selection bias}: the na\"ive comparison
+\[
+  E(w \mid T = 1) - E(w \mid T = 0)
+\]
+does not isolate the treatment effect because the two groups are not
+comparable --- like comparing apples and oranges.
+
+\medskip
+\noindent\textbf{The solution: randomisation.}\;
+If treatment is assigned \emph{randomly}, the treatment and control
+groups are (on average) identical in all characteristics except the
+treatment itself. In this case:
+\[
+  E(w \mid T = 1) - E(w \mid T = 0) = \beta_1
+\]
+gives the \textbf{pure causal effect}, because there is no omitted
+variable bias (the randomisation ensures
+$\operatorname{Cov}(T, u) = 0$).
+
+\begin{explain}[Intuition --- Randomisation]
+In a medical trial, patients are randomly split into a
+\emph{treatment group} (receives the vaccine) and a
+\emph{control group} (receives a placebo). Because assignment is random,
+any difference in outcomes is attributable to the treatment alone ---
+not to pre-existing differences between the groups. The same logic
+applies to social science: random assignment eliminates selection bias.
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Average Treatment Effect (ATE) and the Counterfactual}
+\label{subsec:ate}
+% ------------------------------------------------------------------
+
+\noindent\textbf{Formal framework.}\;
+Let $w_i$ be the outcome of interest, and suppose:
+\begin{align*}
+  w_i &= \beta_0 + \beta_1 T_i + u_i, \\
+  v_i &= u_i + p,
+\end{align*}
+where $p$ captures unobserved confounders. The observed (potentially
+contaminated) outcome is:
+\[
+  \tilde{w}_i = \beta_0 + \beta_1 T_i + v_i
+              = \beta_0 + \beta_1 T_i + p + u_i.
+\]
+
+Before finding the causal effect, the groups must be made
+\emph{comparable}. Under randomisation:
+\begin{align*}
+  E(\tilde{w} \mid T=1) - E(\tilde{w} \mid T=0)
+  &= (\beta_0 + \beta_1 + p) - (\beta_0 + p) \\
+  &= \beta_1.
+\end{align*}
+The confounding term $p$ cancels, giving the \textbf{Average Treatment
+Effect (ATE)}: the pure cause-and-effect relationship.
+
+\begin{explain}[Intuition --- ATE]
+The ATE is the average difference in outcomes between the treated and
+control groups \emph{after} ensuring that the groups are comparable
+(e.g.\ via randomisation). It tells you: ``On average, what is the
+effect of receiving the treatment?''
+\end{explain}
+
+\medskip
+\noindent\textbf{The counterfactual.}\;
+In medical science, a placebo serves as the counterfactual. In social
+science, constructing a counterfactual is harder --- we need a
+\emph{parallel hypothetical world} in which the treated individual did
+\emph{not} receive treatment, and vice versa. The control group
+($T = 0$) serves precisely this role: it represents the
+\textbf{counterfactual} outcome.
+
+% ------------------------------------------------------------------
+\subsection{Methods for Constructing Valid Counterfactual Groups}
+\label{subsec:counterfactual-methods}
+% ------------------------------------------------------------------
+
+Four main methods are used to construct valid counterfactual groups:
+
+\begin{enumerate}
+  \item \textbf{Randomised Control Trial (RCT)} --- a field experiment
+        where treatment is randomly assigned. Often called the
+        ``golden rule'' of causal inference.
+        \emph{(Debate: Banerjee vs.\ Deaton on the merits and
+        limitations of RCTs.)}
+
+  \item \textbf{Difference-in-Differences (DID)} --- exploits variation
+        over time between a treatment group and a control group.
+
+  \item \textbf{Propensity Score Matching (PSM)} --- matches treated
+        and untreated individuals who are similar in observable
+        characteristics.
+
+  \item \textbf{Regression Discontinuity Design (RDD)} --- exploits a
+        sharp eligibility threshold. Individuals just above and just
+        below the threshold are nearly identical, so the discontinuity
+        in treatment at the threshold identifies the causal effect.
+        \emph{(Closer to the threshold $\Rightarrow$ better the match.)}
+\end{enumerate}
+
+\noindent Methods 2--4 are called \textbf{quasi-natural experiments}
+because they approximate random assignment without actually randomising
+treatment.
+
+% ------------------------------------------------------------------
+\subsection{Difference-in-Differences (DID)}
+\label{subsec:did}
+% ------------------------------------------------------------------
+
+DID introduces a \emph{time} dimension. The model is:
+\begin{equation}\label{eq:did-model}
+  y_i = \beta_0 + \beta_1 T_i + \beta_2 G_i
+      + \gamma\,(T_i \times G_i) + u_i
+  \tag{17}
+\end{equation}
+where:
+\begin{itemize}
+  \item $T_i \in \{0, 1\}$: time period
+        ($0 = $ pre-treatment, $1 = $ post-treatment),
+  \item $G_i \in \{0, 1\}$: group indicator
+        ($0 = $ control, $1 = $ treatment),
+  \item $T_i \times G_i$: the \textbf{interaction term}; its coefficient
+        $\gamma$ is the \textbf{pure causal effect} (the DID estimator).
+\end{itemize}
+
+\medskip
+\noindent\textbf{The four conditional expectations.}
+\begin{align}
+  E(y_i \mid T_i=1,\, G_i=1)
+    &= \beta_0 + \beta_1 + \beta_2 + \gamma
+    \tag{17a}\label{eq:did-11}\\
+  E(y_i \mid T_i=1,\, G_i=0)
+    &= \beta_0 + \beta_1
+    \tag{17b}\label{eq:did-10}\\
+  E(y_i \mid T_i=0,\, G_i=1)
+    &= \beta_0 + \beta_2
+    \tag{17c}\label{eq:did-01}\\
+  E(y_i \mid T_i=0,\, G_i=0)
+    &= \beta_0
+    \tag{17d}\label{eq:did-00}
+\end{align}
+
+\medskip
+\noindent\textbf{First difference (across groups, within time).}
+\begin{align*}
+  D_1
+  &= \eqref{eq:did-11} - \eqref{eq:did-10}
+   = (\beta_0 + \beta_1 + \beta_2 + \gamma) - (\beta_0 + \beta_1)
+   = \beta_2 + \gamma, \\
+  D_2
+  &= \eqref{eq:did-01} - \eqref{eq:did-00}
+   = (\beta_0 + \beta_2) - \beta_0
+   = \beta_2.
+\end{align*}
+
+\noindent\textbf{Second difference (the DID estimator).}
+\begin{equation}\label{eq:did-gamma}
+  \boxed{D_1 - D_2
+  = (\beta_2 + \gamma) - \beta_2
+  = \gamma}
+  \tag{18}
+\end{equation}
+
+\noindent The time-invariant group effect $\beta_2$ cancels, and the
+common time trend $\beta_1$ has already been removed. What remains is
+$\gamma$: the causal effect of the treatment.
+
+\begin{explain}[Intuition --- DID]
+DID works by taking \emph{two} differences:
+\begin{enumerate}
+  \item Compare the treatment group before and after treatment (this
+        difference includes both the treatment effect and any time trend).
+  \item Compare the control group before and after (this difference
+        captures only the time trend).
+  \item Subtract the second from the first. The time trend cancels,
+        leaving only the treatment effect $\gamma$.
+\end{enumerate}
+The key assumption is that, in the absence of treatment, the treatment
+and control groups would have followed the same time trend
+(\textbf{parallel trends assumption}).
+\end{explain}
+
+\begin{explain}[Brief overview of RDD]
+In a \textbf{regression discontinuity design}, eligibility for treatment
+is determined by whether a ``running variable'' exceeds a threshold.
+Individuals just above the threshold (treated) are compared with those
+just below (untreated). Since individuals near the threshold are nearly
+identical, the causal effect is identified by the jump in the outcome
+at the cutoff. The closer the observations are to the threshold, the
+more comparable they are.
+\end{explain}
+
+% =====================================================================
+\newpage
+\section{Estimating the Error Variance}
+\label{sec:error-variance}
+% =====================================================================
+
+% ------------------------------------------------------------------
+\subsection{Why We Need \texorpdfstring{$\sigma^2$}{sigma-squared}}
+\label{subsec:need-sigma2}
+% ------------------------------------------------------------------
+
+Recall from Assumption~\ref{as:homo} that
+$V(u \mid x) = \sigma^2$ (homoskedasticity: the variance of the error
+is constant across all values of $x$).
+
+Since $E(u \mid x) = 0$ (Assumption~\ref{as:zcm}):
+\[
+  V(u \mid x) = E(u^2 \mid x) - \bigl[E(u \mid x)\bigr]^2
+              = E(u^2 \mid x) - 0
+              = \sigma^2,
+\]
+so $E(u^2) = \sigma^2$.
+
+\noindent We need to estimate $\sigma^2$ to compute the variances (and
+hence the standard errors) of $\hat{\beta}_0$ and $\hat{\beta}_1$
+(Eqs.\,\eqref{eq:var-beta1}--\eqref{eq:var-beta0}). Without
+$\sigma^2$, we cannot conduct hypothesis tests or construct confidence
+intervals.
+
+% ------------------------------------------------------------------
+\subsection{Na\"ive Estimator and Its Bias}
+\label{subsec:naive-sigma2}
+% ------------------------------------------------------------------
+
+Since $E(u_i^2) = \sigma^2$, a natural first guess is:
+\[
+  \frac{1}{n}\sum_{i=1}^{n} u_i^2,
+\]
+which satisfies $E\!\left(\frac{1}{n}\sum u_i^2\right)
+= \frac{1}{n}\sum E(u_i^2) = \sigma^2$.
+
+However, the population errors $u_i$ are \emph{unobservable}. We must
+use the residuals $\hat{u}_i$ instead. The na\"ive sample counterpart
+$\frac{1}{n}\sum\hat{u}_i^2$ turns out to be \textbf{biased}:
+\begin{equation}\label{eq:naive-biased}
+  E\!\left(\frac{1}{n}\sum_{i=1}^{n}\hat{u}_i^2\right) \neq \sigma^2
+  \tag{19}
+\end{equation}
+
+\noindent\textbf{Why?}\;
+The analogy comes from basic statistics: the sample variance
+$S^2 = \frac{1}{n}\sum(X_i - \bar{X})^2$ is a biased estimator of
+$\sigma^2$, whereas $s^2 = \frac{1}{n-1}\sum(X_i - \bar{X})^2$ is
+unbiased. The ``$n-1$'' accounts for the one restriction imposed by
+estimating the mean $\bar{X}$.
+
+In regression, there are \textbf{two} parameter restrictions (we
+estimated both $\hat{\beta}_0$ and $\hat{\beta}_1$), corresponding to
+the two first-order conditions:
+\[
+  \sum_{i=1}^{n}\hat{u}_i = 0
+  \qquad\text{and}\qquad
+  \sum_{i=1}^{n} x_i\,\hat{u}_i = 0.
+\]
+These two constraints reduce the effective degrees of freedom from $n$
+to $n-2$.
+
+% ------------------------------------------------------------------
+\subsection{The Unbiased Estimator
+  \texorpdfstring{$\hat{\sigma}^2$}{sigma-hat-squared}}
+\label{subsec:unbiased-sigma2}
+% ------------------------------------------------------------------
+
+The \textbf{unbiased} estimator of $\sigma^2$ is:
+\begin{equation}\label{eq:sigma2-hat}
+  \boxed{\hat{\sigma}^2
+  = \frac{1}{n-2}\sum_{i=1}^{n}\hat{u}_i^2
+  = \frac{SSR}{n-2}}
+  \tag{20}
+\end{equation}
+That is, $E(\hat{\sigma}^2) = \sigma^2$.
+
+\begin{explain}[Intuition --- Degrees of Freedom]
+Every time you estimate a parameter from the data, you ``use up'' one
+degree of freedom. In the bivariate model you estimate two parameters
+($\hat\beta_0$ and $\hat\beta_1$), so you divide by $n - 2$ instead of
+$n$. In a $k$-variable regression you would divide by $n - k - 1$
+(one for each slope and one for the intercept).
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Relationship Between Residuals and Errors}
+\label{subsec:resid-vs-error}
+% ------------------------------------------------------------------
+
+It is important to understand that $\hat{u}_i \neq u_i$. The residual
+$\hat{u}_i$ depends on the \emph{estimated} parameters, while the error
+$u_i$ depends on the \emph{true} (unknown) parameters.
+
+\medskip
+\noindent\textbf{Deriving the relationship.}\;
+Since $y_i = \beta_0 + \beta_1 x_i + u_i$ and
+$\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$:
+\begin{align}
+  \hat{u}_i
+  &= y_i - \hat{y}_i
+   = (\beta_0 + \beta_1 x_i + u_i) - (\hat{\beta}_0 + \hat{\beta}_1 x_i)
+   \notag\\
+  &= u_i - (\hat{\beta}_0 - \beta_0) - (\hat{\beta}_1 - \beta_1)\,x_i
+  \tag{21}\label{eq:uhat-decomp}
+\end{align}
+
+\noindent\textbf{Expected value of $\hat{u}_i$.}\;
+Taking expectations:
+\begin{align*}
+  E(\hat{u}_i)
+  &= E(u_i)
+     - \bigl[E(\hat{\beta}_0) - \beta_0\bigr]
+     - \bigl[E(\hat{\beta}_1) - \beta_1\bigr]\,x_i \\
+  &= 0 - (\beta_0 - \beta_0) - (\beta_1 - \beta_1)\,x_i
+   = 0.
+\end{align*}
+So $E(\hat{u}_i) = 0$, but $\hat{u}_i \neq u_i$. The residual is
+\emph{not} an unbiased estimator of \emph{individual} errors --- it
+only has the correct mean.
+
+\medskip
+\noindent\textbf{Sample average form.}\;
+Taking the sample average of \eqref{eq:uhat-decomp}:
+\begin{equation}\label{eq:uhat-avg}
+  \bar{\hat{u}}
+  = \bar{u} - (\hat{\beta}_0 - \beta_0)
+    - (\hat{\beta}_1 - \beta_1)\,\bar{x}
+  \tag{22}
+\end{equation}
+Since $\sum\hat{u}_i = 0$ (by construction), $\bar{\hat{u}} = 0$
+always. This, combined with $\sum x_i\hat{u}_i = 0$, accounts for the
+two restrictions that reduce degrees of freedom from $n$ to $n-2$.
+
+\begin{explain}[Intuition --- Residuals vs.\ Errors]
+The error $u_i$ is the true (unobservable) deviation of $y_i$ from the
+population regression line. The residual $\hat{u}_i$ is the observable
+deviation from the \emph{estimated} regression line. Because the
+estimated line is chosen to minimise $\sum\hat{u}_i^2$, the residuals
+are ``too small'' on average --- they underestimate the true dispersion
+of the errors. Dividing $SSR$ by $n-2$ instead of $n$ corrects for
+this downward bias.
+\end{explain}
+
+\begin{pitfall}[Common pitfalls --- Error Variance]
+\begin{itemize}
+  \item Never confuse $\hat{u}_i$ (residual, observable) with $u_i$
+        (error, unobservable). They are \emph{different} quantities.
+  \item Dividing $SSR$ by $n$ gives a biased estimate of $\sigma^2$.
+        Always use $n-2$ in the bivariate model (or $n-k-1$ in the
+        general $k$-regressor model).
+  \item $\hat{\sigma}^2 = SSR/(n-2)$ is unbiased for $\sigma^2$, but
+        $\hat{\sigma} = \sqrt{SSR/(n-2)}$ is \emph{not} unbiased for
+        $\sigma$ (Jensen's inequality).
+\end{itemize}
+\end{pitfall}
+
+% =====================================================================
+\newpage
+\section*{Cumulative Symbol Glossary}
+\label{sec:glossary}
+\addcontentsline{toc}{section}{Cumulative Symbol Glossary}
+% =====================================================================
+
+\begin{longtable}{@{}p{3.2cm} p{10cm}@{}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+\endhead
+$\theta$ &
+  Generic unknown population parameter. \\
+$\bar{X}$ &
+  Sample mean of a generic random variable $X$. \\
+$\beta_0$ &
+  True (population) intercept of the regression line. \\
+$\beta_1$ &
+  True (population) slope: the change in $E(y\mid x)$ per unit change in $x$. \\
+$\hat{\beta}_0$ &
+  OLS estimator of the intercept $\beta_0$;\;
+  $\hat{\beta}_0 = \bar{y}-\hat{\beta}_1\bar{x}$. \\
+$\hat{\beta}_1$ &
+  OLS estimator of the slope $\beta_1$;\;
+  $\hat{\beta}_1 =
+  \widehat{\operatorname{Cov}}(x,y)/\widehat{\operatorname{Var}}(x)$. \\
+$u_i$ &
+  Error (disturbance) term for observation $i$; captures all factors
+  other than $x_i$ that affect $y_i$. \\
+$x_i$ &
+  Observed value of the regressor (independent variable) for unit $i$
+  (e.g.\ years of education). \\
+$y_i$ &
+  Observed value of the regressand (dependent / endogenous variable)
+  for unit $i$. \\
+$\bar{x}$ &
+  Sample mean of $x$:\; $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$. \\
+$\bar{y}$ &
+  Sample mean of $y$:\; $\bar{y} = \frac{1}{n}\sum_{i=1}^{n} y_i$. \\
+$\mu$ &
+  Population mean (generic). \\
+$\sigma^2$ &
+  Variance of the error term: $\operatorname{Var}(u\mid x)$. \\
+$n$ &
+  Sample size (number of observations). \\
+$S_{xy}$ &
+  Sample covariance of $x$ and $y$:\;
+  $\frac{1}{n}\sum(x_i - \bar{x})(y_i - \bar{y})$. \\
+$S_{xx}$ &
+  Sample variance of $x$:\;
+  $\frac{1}{n}\sum(x_i - \bar{x})^2$. \\
+$\operatorname{plim}$ &
+  Probability limit; the value a random variable converges to in
+  probability as $n\to\infty$. \\
+$E(\cdot)$ &
+  Expected value (population average). \\
+$V(\cdot)$ or $\operatorname{Var}(\cdot)$ &
+  Variance. \\
+$\operatorname{Cov}(\cdot,\cdot)$ &
+  Covariance. \\
+PRF &
+  Population Regression Function: $E(y\mid x) = \beta_0 + \beta_1 x$. \\
+MVUE &
+  Minimum Variance Unbiased Estimator. \\
+BLUE &
+  Best Linear Unbiased Estimator. \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Symbols introduced in Sections 1.7--2.2:}} \\
+\midrule
+$\hat{y}_i$ &
+  Fitted (predicted) value of $y_i$:\;
+  $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$. \\
+$\hat{u}_i$ &
+  OLS residual for observation $i$:\;
+  $\hat{u}_i = y_i - \hat{y}_i$. Note: $\hat{u}_i \neq u_i$ in general. \\
+$Q$ &
+  Sum of squared residuals (OLS objective function):\;
+  $Q = \sum\hat{u}_i^2$. \\
+$SST$ &
+  Total Sum of Squares: $\sum_{i=1}^{n}(y_i - \bar{y})^2$. \\
+$SSE$ &
+  Explained Sum of Squares: $\sum_{i=1}^{n}(\hat{y}_i - \bar{y})^2$. \\
+$SSR$ &
+  Sum of Squared Residuals: $\sum_{i=1}^{n}\hat{u}_i^2$. \\
+$SST_x$ &
+  Total sum of squares of $x$: $\sum_{i=1}^{n}(x_i - \bar{x})^2$. \\
+$R^2$ &
+  Coefficient of determination (R-squared): $SSE/SST = 1 - SSR/SST$. \\
+$\bar{R}^2$ &
+  Uncentered R-squared (for regression through origin). \\
+FOC &
+  First-Order Condition(s) from calculus optimisation. \\
+OVB &
+  Omitted Variable Bias. \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Symbols introduced in Sections 2.3--3.4:}} \\
+\midrule
+$e_i$ &
+  Binary education variable: $e_i \in \{0,1\}$ (illiterate vs.\ literate). \\
+$T_i$ &
+  Treatment indicator: $T_i \in \{0,1\}$ (untreated vs.\ treated). \\
+$G_i$ &
+  Group indicator in DID: $G_i \in \{0,1\}$ (control vs.\ treatment). \\
+$\gamma$ &
+  DID interaction-term coefficient; the pure causal effect. \\
+$\tilde{w}_i$ &
+  Observed (contaminated) outcome:
+  $\tilde{w}_i = \beta_0 + \beta_1 T_i + p + u_i$. \\
+ATE &
+  Average Treatment Effect. \\
+RCT &
+  Randomised Control Trial (field experiment). \\
+DID &
+  Difference-in-Differences. \\
+PSM &
+  Propensity Score Matching. \\
+RDD &
+  Regression Discontinuity Design. \\
+$\hat{\sigma}^2$ &
+  Unbiased estimator of error variance:
+  $\hat{\sigma}^2 = SSR/(n-2)$. \\
+$D_1, D_2$ &
+  First-stage group differences in DID. \\
+\bottomrule
+\end{longtable}
+
+\end{document}

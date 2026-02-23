@@ -1,0 +1,904 @@
+% =============================================================================
+% ECONOMETRICS LECTURE NOTES — Cumulative LaTeX File
+% =============================================================================
+%
+% ---- PROGRESS MAP ----
+% Batches processed:
+%   Batch 1 — filenames: [img1.jpg, img2.jpg, img3.jpg, img4.jpg, img5.jpg]
+%             (no filenames provided; order inferred from upload sequence)
+%             Summary: Lecture recap dated 20 Jan 2026 — OLS method of
+%             estimation, assumptions, deriving OLS estimators via method
+%             of moments, and proof of unbiasedness of \hat{\beta}_1.
+%
+% Last processed location:
+%   Lecture 1 (Recap, 20 Jan 2026) — after unbiasedness proof of \hat{\beta}_1,
+%   concluding with sign-of-\hat{\beta}_1 remark (end of img5).
+%
+% Ordering inferences:
+%   [UNCERTAIN ORDERING — best guess] Images uploaded in correct page order
+%   based on derivation continuity (equations flow (1)→(2)→...→(6) and the
+%   unbiasedness proof follows the estimator derivation without gaps).
+%
+% Flagged uncertainties:
+%   1. Batch1/img1 — "V(\bar{X}) < V(\hat{X}')" — accent on alternative
+%      estimator symbol is unclear. Best guess: \tilde{X} or \hat{X}'.
+%      ACTION REQUIRED: verify.
+%   2. Batch1/img1 — struck-through word before "autocorrelation" is
+%      partially illegible. Best guess: "heteroscedasticity" (crossed out).
+%      ACTION REQUIRED: verify.
+%   3. Batch1/img5 — expression "\hat{\beta}_1 = \beta_1 + \frac{1}{n}
+%      \sum(x_i - \bar{x})u_i" may be missing denominator carried from
+%      previous page. Transcribed as fraction with denominator based on
+%      mathematical context. ACTION REQUIRED: verify against original.
+%
+% ---- CHANGE LOG ----
+% Batch 1 (initial):
+%   - Transcribed 5 pages of Lecture 1 recap (20 Jan 2026).
+%   - Added explanations (Intuition, Step-by-step, Examples, Assumptions,
+%     Pitfalls) after each major derivation block.
+%   - Recreated hand-drawn PRF diagram (TikZ).
+%   - Created cumulative symbol glossary.
+%   - Flagged 3 uncertain items (see above).
+%
+% ---- ACTION REQUIRED ----
+%   1. Confirm: is the alternative-estimator symbol in img1 \tilde{X} or
+%      \hat{X}' or something else? (MVUE line)
+%   2. Confirm: is the struck-through word in img1 "heteroscedasticity"?
+%   3. Confirm: does the top of img5 carry a denominator
+%      \frac{1}{n}\sum(x_i-\bar{x})^2 from the bottom of img4?
+% =============================================================================
+
+\documentclass[12pt, a4paper]{article}
+
+% ---- Packages ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing, arrows.meta, calc}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{ulem}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable, skins}
+
+% ---- Custom environments ----
+\newtheorem{definition}{Definition}[section]
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+
+% Explanation box
+\newtcolorbox{explain}[1][]{%
+  colback=blue!3, colframe=blue!40!black, fonttitle=\bfseries,
+  title=#1, breakable, enhanced}
+
+% Pitfall box
+\newtcolorbox{pitfall}[1][]{%
+  colback=red!3, colframe=red!50!black, fonttitle=\bfseries,
+  title=#1, breakable, enhanced}
+
+% Worked-example box
+\newtcolorbox{workedexample}[1][]{%
+  colback=green!3, colframe=green!40!black, fonttitle=\bfseries,
+  title=#1, breakable, enhanced}
+
+% Uncertainty flag command
+\newcommand{\unclear}[2]{%
+  \textcolor{red}{\textbf{[UNCLEAR --- best guess: #1]}}%
+  \marginpar{\tiny\textcolor{red}{#2}}%
+}
+
+% ---- Title ----
+\title{\textbf{Econometrics Lecture Notes}\\[4pt]
+\large Ordinary Least Squares --- Method of Estimation}
+\author{Transcribed from Handwritten Notes}
+\date{Lecture Date: 20 January 2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% =============================================================================
+% Batch 1 — filenames: [img1.jpg .. img5.jpg] (order inferred from upload)
+% Summary: OLS recap — estimation, assumptions, derivation, unbiasedness.
+% =============================================================================
+
+% =====================================================================
+\section{Recap: Ordinary Least Squares --- Method of Estimation}
+\label{sec:ols-recap}
+% =====================================================================
+
+% ---- Per-section glossary (see cumulative glossary in Appendix) ----
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, title=\textbf{Key Symbols in This Section}]
+\begin{tabular}{@{}ll@{}}
+$\theta$            & Unknown population parameter \\
+$\bar{X}$           & Sample mean \\
+$\hat{\beta}_0,\;\hat{\beta}_1$ & OLS estimators of intercept and slope \\
+$\beta_0,\;\beta_1$ & True (population) intercept and slope \\
+$u_i$               & Error / disturbance term for observation $i$ \\
+$x_i,\;y_i$         & Observed values of regressor and regressand \\
+$\bar{x},\;\bar{y}$ & Sample means of $x$ and $y$ \\
+$\sigma^2$          & Variance of the error term \\
+$n$                 & Sample size \\
+\end{tabular}
+\end{tcolorbox}
+
+% ------------------------------------------------------------------
+\subsection{From Population to Sample}
+\label{subsec:pop-to-sample}
+% ------------------------------------------------------------------
+
+% ---- Verbatim transcription (img 1, top) ----
+\noindent\textbf{[Verbatim from notes — img\,1, top]}
+
+\begin{itemize}[leftmargin=2em]
+  \item Population distribution (parameter $\theta$: unknown).
+  \item[$\downarrow$] Sample (Statistic)
+  \item[$\downarrow$] Sample mean ($\bar{X}$)
+  \item[$\downarrow$] Draw an inference about unknown population parameters
+        using sample statistic $\bar{X}$.
+\end{itemize}
+
+\begin{align}
+  &\text{If } E(\bar{X}) = \theta : \text{ unbiased.} \label{eq:unbiased-def} \\[4pt]
+  &\operatorname{plim}_{n\to\infty} \bar{X} \to \theta : \text{ consistent.}
+    \label{eq:consistent-def} \\[4pt]
+  &V(\bar{X}) < V(\tilde{X}) : \text{ Minimum Variance Unbiased Estimator (MVUE).}
+    \label{eq:mvue-def}
+    %% [UNCLEAR — best guess: \tilde{X}]
+    %% Alt 1: \hat{X}' (X-hat-prime) — another unbiased estimator.
+    %% Alt 2: \tilde{X} (X-tilde) — generic alternative estimator.
+    %% Rationale: standard econometrics notation uses tilde for
+    %% "any other unbiased estimator."  ACTION REQUIRED: verify.
+\end{align}
+
+\noindent The MVUE is also called the \textbf{Best} estimator.\\[6pt]
+Apply these properties to the \textbf{bivariate OLS model} parameters
+$\to \hat{\beta}_1$ and $\hat{\beta}_0$.
+
+% ---- Explanation ----
+\begin{explain}[Intuition]
+We have some unknown truth about a population (captured by $\theta$).
+We cannot observe the whole population, so we take a \emph{sample} and
+compute a statistic (here $\bar{X}$). A good estimator should be:
+\begin{enumerate}
+  \item \textbf{Unbiased}: on average across many samples it hits the true value.
+  \item \textbf{Consistent}: as we collect more data it converges to the truth.
+  \item \textbf{Efficient (MVUE)}: among all unbiased estimators it has the
+        smallest spread (variance) — the ``best'' one.
+\end{enumerate}
+We want the OLS estimators $\hat{\beta}_0$ and $\hat{\beta}_1$ to satisfy
+all three.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:unbiased-def}}: If the expected value of the
+        sample mean equals the population parameter, the estimator is
+        \emph{unbiased} — no systematic over- or under-estimation.
+  \item \textbf{Eq.\,\eqref{eq:consistent-def}}: As $n\to\infty$, the
+        probability limit of $\bar{X}$ equals $\theta$. Large samples
+        ``wash out'' randomness.
+  \item \textbf{Eq.\,\eqref{eq:mvue-def}}: Among \emph{all} unbiased
+        estimators, $\bar{X}$ has the smallest variance — it is the most
+        precise. This makes it the ``best'' (in the MVUE / BLUE sense).
+\end{enumerate}
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Assumptions of OLS}
+\label{subsec:ols-assumptions}
+% ------------------------------------------------------------------
+
+\noindent\textbf{[Verbatim from notes — img\,1, lower half]}
+
+\begin{assumption}[Linear in parameters]\label{as:linear}
+  The population model is $y_i = \beta_0 + \beta_1 x_i + u_i$.
+\end{assumption}
+
+\begin{assumption}[Random sampling]\label{as:random}
+  $\{(x_i, y_i) : i = 1, 2, \dots, n\}$ is a random sample from the
+  population.
+\end{assumption}
+
+\begin{assumption}[Zero conditional mean]\label{as:zcm}
+  $E(u \mid x) = 0$.
+\end{assumption}
+
+\begin{assumption}[Homoskedasticity]\label{as:homo}
+  $V(u \mid x) = \sigma^2 < \infty$.
+\end{assumption}
+
+\begin{assumption}[No correlation between regressor and error]\label{as:nocov}
+  $\operatorname{Cov}(x, u) = 0$.
+\end{assumption}
+
+\begin{assumption}[Variation in $x$]\label{as:variation}
+  There exists some variation in $x_i$, \; $i = 1, 2, \dots, n$.
+  (i.e.\ not all $x_i$ are identical.)
+\end{assumption}
+
+\medskip
+\noindent\textit{%
+  Holds even without perfect multicollinearity and
+  \unclear{\sout{heteroscedasticity}}{Batch1/img1: struck-through word;
+    Alt: ``heteroskedasticity'' (US spelling). ACTION REQUIRED: verify.}
+  autocorrelation.}
+%% [UNCLEAR — best guess: the word "heteroscedasticity" is struck through
+%% and replaced by "autocorrelation".]
+%% Alt 1: The sentence means "holds provided there is no perfect
+%%         multicollinearity or autocorrelation."
+%% Alt 2: The sentence lists conditions that are NOT needed for basic
+%%         OLS unbiasedness (multicollinearity and autocorrelation are
+%%         separate issues).
+%% ACTION REQUIRED: verify intended meaning.
+
+\medskip
+\noindent From Assumption~\ref{as:zcm}, $E(u\mid x)=0$, we derive the
+\textbf{Population Regression Function (PRF)}.
+
+% ---- Explanation ----
+\begin{explain}[Intuition --- OLS Assumptions]
+Think of these six conditions as the ``rules of the game.'' If they hold,
+OLS gives you the best (most precise, unbiased) straight-line fit.
+\begin{itemize}
+  \item \textbf{A\ref{as:linear}}: The relationship is a straight line
+        (in parameters, not necessarily in $x$).
+  \item \textbf{A\ref{as:random}}: Every data point is drawn independently
+        from the same population.
+  \item \textbf{A\ref{as:zcm}}: Knowing $x$ tells you nothing about the
+        average error — the error is ``mean-zero'' regardless of $x$.
+  \item \textbf{A\ref{as:homo}}: The spread of the error is the same for
+        every value of $x$ (constant variance).
+  \item \textbf{A\ref{as:nocov}}: The regressor and the error are
+        uncorrelated — $x$ is ``clean.''
+  \item \textbf{A\ref{as:variation}}: There is actual spread in your $x$
+        data; otherwise you cannot estimate a slope.
+\end{itemize}
+\end{explain}
+
+\begin{explain}[Assumptions used]
+  All six assumptions listed above (A\ref{as:linear}--A\ref{as:variation})
+  are the classical OLS assumptions for the bivariate model. Assumptions
+  \ref{as:linear}--\ref{as:zcm} suffice for unbiasedness; adding
+  \ref{as:homo} yields the Gauss--Markov result (BLUE).
+\end{explain}
+
+\begin{pitfall}[Common pitfalls / sanity checks]
+\begin{itemize}
+  \item $E(u\mid x)=0$ is \emph{stronger} than $\operatorname{Cov}(x,u)=0$.
+        The former implies the latter, but not vice versa.
+  \item ``Linear in parameters'' does \emph{not} mean the relationship
+        between $y$ and $x$ looks like a straight line on a scatter plot.
+        $y = \beta_0 + \beta_1 x^2 + u$ is still linear in parameters.
+  \item If all $x_i$ are equal, $\operatorname{Var}(x) = 0$ and you
+        cannot divide by it — the OLS formula breaks.
+\end{itemize}
+\end{pitfall}
+
+% ------------------------------------------------------------------
+\subsection{The Bivariate OLS Model and the Population Regression Function}
+\label{subsec:model-prf}
+% ------------------------------------------------------------------
+
+\noindent\textbf{[Verbatim from notes — img\,2, top]}
+
+\medskip
+\noindent\textbf{Model:}
+\begin{equation}\label{eq:model}
+  y_i = \beta_0 + \beta_1 x_i + u_i \tag{1}
+\end{equation}
+
+\begin{equation}\label{eq:prf}
+  E(y_i \mid x_i) = \beta_0 + \beta_1 x_i + 0
+                   = \beta_0 + \beta_1 x_i
+  \quad\longrightarrow\quad
+  \textbf{Population Regression Function (PRF).}
+\end{equation}
+
+\medskip
+\noindent\textbf{Note:}
+\begin{itemize}
+  \item $y \to$ random $\;\to\; u \to$ random.
+  \item $x$ --- given $\to$ exogenous, constant $\to$ not random.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Note 1.}\; $E(y_i \mid x = x_i)$ is a linear function of $x$.
+\begin{enumerate}[label=\roman*)]
+  \item One unit change in $x$ changes the conditional expected value of
+        $y$, given $x$, by $\beta_1$ units.
+  \item For any given value of $x_i$, the distribution of $y_i$ is centred
+        about $E(y_i \mid x = x_i)$.
+\end{enumerate}
+
+% ---- Recreated diagram ----
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=0.9]
+  % Axes
+  \draw[->, thick] (-0.5,0) -- (8.5,0) node[right]{$x$};
+  \draw[->, thick] (0,-0.5) -- (0,6) node[above]{$E(y\mid x)$};
+
+  % PRF line
+  \draw[blue, very thick] (0.5,1) -- (7.5,5)
+    node[right, black]{\small $E(y\mid x) = \beta_0 + \beta_1 x$};
+
+  % Points on the line
+  \foreach \xval/\yval/\lab in {2/1.86/x_1, 4/3/x_2, 6/4.12/x_3} {
+    \filldraw[blue] (\xval,\yval) circle (2pt);
+    \node[below] at (\xval,0) {$\lab$};
+    \draw[dashed, gray] (\xval,0) -- (\xval,\yval);
+    % Bell curve (distribution of y_i around E(y|x_i))
+    \begin{scope}[shift={(\xval,\yval)}, rotate=90]
+      \draw[red!70!black, thick] plot[domain=-1.2:1.2, samples=40]
+        ({\x},{0.6*exp(-2*\x*\x)});
+    \end{scope}
+  }
+\end{tikzpicture}
+\caption{Population Regression Function:
+  for each $x_i$, the distribution of $y_i$ (shown in red) is centred on
+  $E(y_i\mid x_i)$ along the blue PRF line.
+  \textit{[Recreated from hand-drawn figure in img\,2.]}}
+\label{fig:prf}
+\end{figure}
+
+% ---- Explanation ----
+\begin{explain}[Intuition --- PRF]
+The PRF is the ``true'' average relationship between $x$ and $y$ in the
+population. At every value of $x$, the actual $y$ values are scattered
+around this line — the scatter is the error $u_i$. OLS tries to
+\emph{estimate} this line from sample data.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:model}}: The data-generating process.
+        Each observation $y_i$ is the sum of a systematic part
+        ($\beta_0 + \beta_1 x_i$) and a random part ($u_i$).
+  \item \textbf{Eq.\,\eqref{eq:prf}}: Taking the conditional expectation
+        and using $E(u_i\mid x_i)=0$ (Assumption~\ref{as:zcm})
+        eliminates $u_i$, leaving the PRF.
+  \item \textbf{Note (i)}: $\beta_1$ is the \emph{marginal effect} of $x$
+        on $E(y\mid x)$.
+  \item \textbf{Note (ii)}: The distribution of $y_i$ at any $x_i$ is
+        symmetric around the PRF (see Figure~\ref{fig:prf}).
+\end{enumerate}
+\end{explain}
+
+% ------------------------------------------------------------------
+\subsection{Minimising the Error: Two Methods}
+\label{subsec:two-methods}
+% ------------------------------------------------------------------
+
+\noindent\textbf{[Verbatim from notes — img\,2, middle--bottom]}
+
+\medskip
+\noindent Minimise error --- How?
+\begin{enumerate}
+  \item Method of moments
+  \item Fitted values (differential calculus)
+\end{enumerate}
+
+\medskip
+\noindent\textbf{OLS:}\; Let $\{(x_i, y_i) : i = 1, 2, \dots, n\}$.
+\[
+  y_i = \beta_0 + \beta_1 x_i + u_i
+  \quad\leftarrow\;
+  \text{stochastic: factors other than } x_i \text{ affecting } y_i.
+\]
+$x_i$ = observed factor (e.g.\ education). \quad
+$y_i$ = endogenous variable.
+
+\medskip
+\noindent\textbf{Objective:}\; Obtain $\hat{\beta}_0,\;\hat{\beta}_1$.
+\begin{enumerate}
+  \item Method of moments.
+  \item Method of fitted values --- differential calculus.
+\end{enumerate}
+
+\noindent Let the population parameters $= \theta$,\; $\beta_0$ and
+$\theta = f(\mu)$ where $\mu$ = population mean.
+
+\noindent So the sample counterpart is $\bar{y}$.
+\begin{itemize}
+  \item If $E(\bar{y}) = \mu$ \;$\Rightarrow$\; replace $\mu$ with $\bar{y}$.
+  \item $\displaystyle\operatorname{plim}_{n\to\infty} \bar{y} \to \mu$.
+\end{itemize}
+
+\noindent Replace $\mu$ with $\bar{y}\;\to\; f(\bar{y})$.
+
+\noindent Now, $\operatorname{plim}\, E(f(\bar{y})) = \theta$ and if $\mu$
+is a linear function of $f(\mu)$, then
+$E(f(\bar{y})) = \theta \;\to$ \textbf{method of moments}.
+
+% ---- Explanation ----
+\begin{explain}[Intuition --- Method of Moments]
+The idea is beautifully simple: if a population parameter can be written as a
+function of population means (moments), then estimate it by plugging in
+\emph{sample} means. If the sample mean is unbiased for the population mean,
+and the function is linear, the resulting estimator is also unbiased.
+That is the \textbf{method of moments} in one sentence.
+\end{explain}
+
+\begin{workedexample}[Simple special case]
+\textbf{Estimating a population mean.}\\
+Population parameter: $\theta = \mu$ (the mean). The function is just
+$f(\mu) = \mu$ (identity). Replace $\mu$ with $\bar{y}$:
+\[
+  \hat{\theta} = f(\bar{y}) = \bar{y}.
+\]
+Since $E(\bar{y}) = \mu = \theta$, the estimator is unbiased. Done!
+\end{workedexample}
+
+% ------------------------------------------------------------------
+\subsection{Deriving the OLS Estimators via Method of Moments}
+\label{subsec:ols-derivation}
+% ------------------------------------------------------------------
+
+\noindent\textbf{[Verbatim from notes — img\,3]}
+
+\medskip
+\noindent Apply this to Eq.\,\eqref{eq:model}:\;
+$y_i = \beta_0 + \beta_1 x_i + u_i$.
+
+\medskip
+\noindent Use $E(u_i \mid x = x_i) = 0$:
+\begin{equation}\label{eq:moment1-pop}
+  E\!\left(y_i - \beta_0 - \beta_1 x_i\right) = 0 \tag{2}
+\end{equation}
+
+\noindent Also, $\operatorname{Cov}(u_i, x_i) = 0$:
+\[
+  \Rightarrow\; E(u_i\, x_i) = 0
+\]
+\begin{equation}\label{eq:moment2-pop}
+  \Rightarrow\; E\!\left(x_i\!\left(y_i - \beta_0 - \beta_1 x_i\right)\right) = 0
+  \tag{3}
+\end{equation}
+
+\medskip
+\noindent If sample projection on population is correct, then unbiasedness
+\& consistency hold:
+\[
+  E(\hat{\beta}_0) = \beta_0 \quad\text{and are consistent.}
+  \qquad E(\hat{\beta}_1) = \beta_1.
+\]
+
+\medskip
+\noindent\textbf{Replace \eqref{eq:moment1-pop} \& \eqref{eq:moment2-pop}
+with sample counterparts:}
+
+\begin{equation}\label{eq:moment1-sample}
+  \frac{1}{n}\sum_{i=1}^{n}\!\left(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i\right) = 0
+  \tag{4}
+\end{equation}
+
+\begin{equation}\label{eq:moment2-sample}
+  \frac{1}{n}\sum_{i=1}^{n}
+  x_i\!\left(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i\right) = 0
+  \tag{5}
+\end{equation}
+
+\bigskip
+\noindent\textbf{From \eqref{eq:moment1-sample}:}
+\[
+  \bar{y} - \hat{\beta}_0 - \hat{\beta}_1\,\bar{x} = 0
+\]
+\begin{equation}\label{eq:beta0-hat}
+  \Rightarrow\quad \bar{y} = \hat{\beta}_0 + \hat{\beta}_1\,\bar{x}
+  \qquad\Longrightarrow\qquad
+  \boxed{\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\,\bar{x}}
+  \tag{6}
+\end{equation}
+
+\bigskip
+\noindent\textbf{From \eqref{eq:moment2-sample}:}
+\[
+  \frac{1}{n}\sum_{i=1}^{n}
+  \!\left(x_i y_i - \hat{\beta}_0\, x_i - \hat{\beta}_1\, x_i^2\right) = 0
+\]
+\[
+  \Rightarrow\quad
+  \frac{1}{n}\sum x_i y_i
+  \;-\; \hat{\beta}_0\,\bar{x}
+  \;-\; \hat{\beta}_1 \frac{1}{n}\sum x_i^2 = 0.
+\]
+
+\noindent Substituting \eqref{eq:beta0-hat} for $\hat{\beta}_0$:
+\[
+  \frac{1}{n}\sum x_i y_i
+  = \left(\bar{y} - \hat{\beta}_1\,\bar{x}\right)\bar{x}
+  + \hat{\beta}_1\,\frac{1}{n}\sum x_i^2
+\]
+\[
+  \Rightarrow\quad
+  \frac{1}{n}\sum x_i y_i
+  = \bar{x}\,\bar{y} - \hat{\beta}_1\,(\bar{x})^2
+  + \hat{\beta}_1\,\frac{1}{n}\sum x_i^2
+\]
+
+% ---- continued on img 4, top ----
+\noindent\textbf{[Verbatim from notes — img\,4, top]}
+
+\[
+  \Rightarrow\quad
+  \frac{1}{n}\sum x_i y_i - \bar{x}\,\bar{y}
+  = \hat{\beta}_1\!\left(\frac{1}{n}\sum x_i^2 - (\bar{x})^2\right)
+\]
+\[
+  \Rightarrow\quad
+  \widehat{\operatorname{Cov}}(x,y)
+  = \hat{\beta}_1 \cdot \widehat{\operatorname{Var}}(x)
+\]
+\[
+  \Rightarrow\quad
+  \frac{S_{xy}}{S_{xx}}
+  = \frac{\widehat{\operatorname{Cov}}(x,y)}{\widehat{\operatorname{Var}}(x)}
+\]
+
+\begin{equation}\label{eq:beta1-hat}
+  \boxed{
+  \hat{\beta}_1
+  = \frac{\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}%
+         {\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  = \frac{\widehat{\operatorname{Cov}}(x,y)}{\widehat{\operatorname{Var}}(x)}
+  }
+  \tag{7}
+\end{equation}
+
+\noindent where
+$\widehat{\operatorname{Var}}(x) = \dfrac{1}{n}\sum_{i=1}^{n}(x_i-\bar{x})^2$.
+
+\begin{explain}[Intuition --- OLS Estimators]
+\textbf{$\hat{\beta}_1$} (the slope) is just the sample covariance of $x$
+and $y$ divided by the sample variance of $x$. If $x$ and $y$ move together
+(positive covariance), the slope is positive; if they move oppositely, it is
+negative.
+
+\textbf{$\hat{\beta}_0$} (the intercept) adjusts the line so that the
+regression line passes through the point of means $(\bar{x},\bar{y})$.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,(2)}: The population moment condition from
+        $E(u_i)=0$. In the sample, replace the expectation with an average.
+  \item \textbf{Eq.\,(3)}: The population moment condition from
+        $\operatorname{Cov}(x,u)=0$, i.e.\ $E(x_i u_i)=0$.
+  \item \textbf{Eq.\,(4)}: Sample analog of (2). Dividing through by $n$
+        gives $\bar{y} - \hat{\beta}_0 - \hat{\beta}_1\bar{x} = 0$.
+  \item \textbf{Eq.\,(5)}: Sample analog of (3).
+  \item \textbf{Eq.\,(6)}: Solving (4) for $\hat{\beta}_0$ yields
+        $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}$. (The OLS
+        regression line passes through $(\bar{x},\bar{y})$.)
+  \item Substituting (6) into (5) and simplifying algebra yields
+        \textbf{Eq.\,(7)}: $\hat{\beta}_1 =
+        \widehat{\operatorname{Cov}}(x,y)/\widehat{\operatorname{Var}}(x)$.
+  \item \textbf{Key algebraic fact used}: $\sum(x_i - \bar{x})\bar{y} =
+        \bar{y}\sum(x_i-\bar{x}) = 0$, so $(y_i - \bar{y})$ in the
+        numerator can be replaced by just $y_i$. This is the ``check?''
+        annotation in the original notes.
+\end{enumerate}
+\end{explain}
+
+\begin{workedexample}[Tiny numerical example]
+Suppose $n=3$ with data $(x_i,y_i)$: $(1,2)$, $(2,4)$, $(3,5)$.
+\[
+  \bar{x} = 2,\quad \bar{y} = \tfrac{11}{3}\approx 3.67.
+\]
+\[
+  \widehat{\operatorname{Cov}}(x,y)
+  = \tfrac{1}{3}\bigl[(1-2)(2-3.67)+(2-2)(4-3.67)+(3-2)(5-3.67)\bigr]
+  = \tfrac{1}{3}(1.67+0+1.33) = 1.
+\]
+\[
+  \widehat{\operatorname{Var}}(x)
+  = \tfrac{1}{3}[(1-2)^2+(2-2)^2+(3-2)^2] = \tfrac{2}{3}.
+\]
+\[
+  \hat{\beta}_1 = \frac{1}{2/3} = 1.5,
+  \qquad
+  \hat{\beta}_0 = 3.67 - 1.5\times 2 = 0.67.
+\]
+So the estimated line is $\hat{y} = 0.67 + 1.5\,x$.
+\end{workedexample}
+
+\begin{explain}[Assumptions used]
+  \begin{itemize}
+    \item Assumption~\ref{as:zcm} ($E(u\mid x)=0$) $\to$ moment
+          condition (2).
+    \item Assumption~\ref{as:nocov} ($\operatorname{Cov}(x,u)=0$)
+          $\to$ moment condition (3).
+    \item Assumption~\ref{as:variation} (variation in $x$)
+          $\to$ ensures $\widehat{\operatorname{Var}}(x)\neq 0$ so we
+          can divide.
+  \end{itemize}
+\end{explain}
+
+\begin{pitfall}[Common pitfalls / sanity checks]
+\begin{itemize}
+  \item The ``$1/n$'' in numerator \emph{and} denominator cancels, so you
+        can equivalently write
+        $\hat\beta_1 = \sum(x_i-\bar x)(y_i-\bar y)/\sum(x_i-\bar x)^2$.
+  \item $\hat\beta_0$ has no stand-alone meaning if the data never have
+        $x=0$. In that case interpret $\hat\beta_0$ with caution.
+  \item Double-check: the regression line \emph{always} passes through
+        $(\bar x, \bar y)$. If your line does not, you made an algebra error.
+\end{itemize}
+\end{pitfall}
+
+% ------------------------------------------------------------------
+\subsection{Unbiasedness of \texorpdfstring{$\hat{\beta}_1$}{beta-1-hat}}
+\label{subsec:unbiasedness}
+% ------------------------------------------------------------------
+
+\noindent\textbf{[Verbatim from notes — img\,4 (lower half) and img\,5]}
+
+\medskip
+\noindent\textbf{``Check''} that $(x_i-\bar{x})$ in the numerator absorbs
+$\bar{y}$:
+\begin{equation}\label{eq:beta1-alt}
+  \hat{\beta}_1
+  = \frac{\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}%
+         {\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  = \frac{\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})\,y_i}%
+         {\dfrac{1}{n}\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\end{equation}
+(since $\sum_{i=1}^{n}(x_i - \bar{x})\bar{y} = \bar{y}\cdot 0 = 0$).
+
+\bigskip
+\noindent\textbf{Substitute $y_i = \beta_0 + \beta_1 x_i + u_i$:}
+\begin{align}
+  \hat{\beta}_1
+  &= \frac{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})
+     (\beta_0 + \beta_1 x_i + u_i)}%
+     {\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+     \notag\\[6pt]
+  &= \frac{\frac{1}{n}\sum(x_i-\bar{x})\,\beta_0
+     + \frac{1}{n}\sum(x_i-\bar{x})\,\beta_1 x_i
+     + \frac{1}{n}\sum(x_i-\bar{x})\,u_i}%
+     {\frac{1}{n}\sum(x_i-\bar{x})^2}
+     \notag\\[6pt]
+  &= \frac{\beta_0\!\cdot\! 0
+     \;+\; \beta_1\!\cdot\!\frac{1}{n}\sum(x_i-\bar{x})x_i
+     \;+\; \frac{1}{n}\sum(x_i-\bar{x})\,u_i}%
+     {\frac{1}{n}\sum(x_i-\bar{x})^2}
+     \label{eq:expand-beta1}
+\end{align}
+
+\noindent\textbf{Key identity:}
+\[
+  \frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})\,x_i
+  = \frac{1}{n}\sum x_i^2 - \bar{x}\cdot\frac{1}{n}\sum x_i
+  = \frac{1}{n}\sum x_i^2 - (\bar{x})^2
+  = \frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2.
+\]
+
+\noindent Therefore:
+\begin{align}
+  \hat{\beta}_1
+  &= \frac{\beta_1\cdot\frac{1}{n}\sum(x_i-\bar{x})^2
+     + \frac{1}{n}\sum(x_i-\bar{x})\,u_i}%
+     {\frac{1}{n}\sum(x_i-\bar{x})^2}
+     \notag\\[8pt]
+  &= \beta_1
+     + \frac{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})\,u_i}%
+            {\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+     \notag
+\end{align}
+
+\begin{equation}\label{eq:beta1-decomp}
+  \boxed{
+    \hat{\beta}_1
+    = \beta_1
+    + \frac{\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})\,u_i}%
+           {\displaystyle\sum_{i=1}^{n}(x_i - \bar{x})^2}
+  }
+  \tag{8}
+\end{equation}
+
+%% [UNCLEAR — best guess: img 5 top appears to write this without the
+%% denominator, but the denominator is carried over from img 4 bottom.
+%% The expression as shown in Eq.(8) is mathematically correct.
+%% Alt 1: the denominator is present but partially cut off in the image.
+%% Alt 2: the notes use shorthand, omitting the denominator.
+%% ACTION REQUIRED: verify against original.]
+
+\bigskip
+\noindent\textbf{[Verbatim from notes — img\,5]}
+
+\medskip
+\noindent\textbf{On taking the expectation:}
+\begin{align}
+  E(\hat{\beta}_1)
+  &= \beta_1
+     + \frac{1}{\sum(x_i-\bar{x})^2}
+       \sum_{i=1}^{n} E\!\left[(x_i - \bar{x})\,u_i\right]
+     \label{eq:exp-step1}\\[6pt]
+  &= \beta_1
+     + \frac{1}{\sum(x_i-\bar{x})^2}
+       \sum_{i=1}^{n} E\!\left[(x_i - \bar{x})(u_i - \bar{u})\right]
+     \label{eq:exp-step2}
+\end{align}
+
+\noindent Since $x$ is non-random (fixed in repeated samples) and
+$E(u_i) = 0$ by Assumption~\ref{as:zcm}:
+\[
+  E\!\left[(x_i - \bar{x})\,u_i\right]
+  = (x_i - \bar{x})\,E(u_i) = 0.
+\]
+
+\begin{equation}\label{eq:unbiased-beta1}
+  \boxed{E(\hat{\beta}_1) = \beta_1 + 0 = \beta_1}
+  \tag{9}
+\end{equation}
+\[
+  \therefore\; \hat{\beta}_1 \text{ is \textbf{unbiased} for } \beta_1.
+\]
+
+\bigskip
+\noindent\textbf{Sign of $\hat{\beta}_1$:}
+\[
+  \hat{\beta}_1
+  = \frac{\widehat{\operatorname{Cov}}(x,y)}{\widehat{\operatorname{Var}}(x)}.
+\]
+If $\widehat{\operatorname{Var}}(x) > 0$ (guaranteed by
+Assumption~\ref{as:variation}), then the \textbf{sign} of $\hat{\beta}_1$
+is determined entirely by $\widehat{\operatorname{Cov}}(x,y)$.
+
+% ---- Explanation ----
+\begin{explain}[Intuition --- Unbiasedness]
+Eq.\,\eqref{eq:beta1-decomp} says:\\
+\emph{``What you estimate = the truth + noise.''}\\
+The noise term involves $\sum(x_i-\bar{x})u_i$. When we take the expected
+value, the noise averages out to zero because (a)~$x$ is fixed, and
+(b)~the errors have mean zero. So on average, $\hat\beta_1$ hits $\beta_1$
+exactly. That is unbiasedness.
+\end{explain}
+
+\begin{explain}[Step-by-step commentary]
+\begin{enumerate}
+  \item \textbf{Eq.\,\eqref{eq:beta1-alt}}: Rewrite $\hat\beta_1$ so
+        that $y_i$ appears alone (without $\bar y$) in the numerator.
+        This is valid because $\sum(x_i-\bar x)\,\bar y = 0$.
+  \item \textbf{Eq.\,\eqref{eq:expand-beta1}}: Substitute the model
+        $y_i = \beta_0 + \beta_1 x_i + u_i$ and expand.
+  \item The $\beta_0$ term vanishes because $\sum(x_i-\bar x)=0$.
+  \item The $\beta_1$ term simplifies because
+        $\sum(x_i-\bar x)x_i = \sum(x_i-\bar x)^2$ (the key algebraic
+        identity), so $\beta_1$ cancels with the denominator.
+  \item We are left with $\hat\beta_1 = \beta_1 + \text{noise}$
+        (Eq.\,\eqref{eq:beta1-decomp}).
+  \item \textbf{Eq.\,\eqref{eq:exp-step1}}: Take expectations.
+        Since $x$ is non-stochastic, $(x_i-\bar x)$ passes through $E[\cdot]$.
+  \item $E(u_i)=0$ kills the noise term $\Rightarrow$
+        $E(\hat\beta_1)=\beta_1$\; (Eq.\,\eqref{eq:unbiased-beta1}).
+  \item \textbf{Sign of $\hat\beta_1$}: Since $\widehat{\operatorname{Var}}(x)>0$,
+        positive covariance $\Rightarrow$ positive $\hat\beta_1$ and vice versa.
+\end{enumerate}
+\end{explain}
+
+\begin{explain}[Assumptions used]
+  \begin{itemize}
+    \item \textbf{A\ref{as:linear}} (linear model): needed to substitute
+          $y_i = \beta_0 + \beta_1 x_i + u_i$.
+    \item \textbf{A\ref{as:random}} (random sampling): ensures observations
+          are i.i.d.
+    \item \textbf{A\ref{as:zcm}} ($E(u\mid x)=0$): the critical assumption
+          that makes $E[(x_i-\bar x)u_i]=0$.
+    \item \textbf{A\ref{as:variation}} (variation in $x$): ensures denominator
+          $\neq 0$.
+  \end{itemize}
+\end{explain}
+
+\begin{pitfall}[Common pitfalls / sanity checks]
+\begin{itemize}
+  \item Unbiasedness is a \emph{repeated-sampling} property. For any
+        single sample, $\hat\beta_1$ will almost certainly not equal
+        $\beta_1$. It means the \emph{average} across all possible
+        samples equals $\beta_1$.
+  \item If $E(u\mid x)\neq 0$ (omitted variable bias, endogeneity),
+        unbiasedness fails. This is the most common way OLS goes wrong
+        in practice.
+  \item The step from Eq.\,\eqref{eq:exp-step1} to
+        Eq.\,\eqref{eq:exp-step2} uses the fact that $\bar u$ also has
+        expectation zero, so the $(u_i-\bar u)$ form is equivalent.
+        (Some textbooks skip this; the notes include it for completeness.)
+\end{itemize}
+\end{pitfall}
+
+\begin{explain}[Further reading]
+  \textit{Introductory Econometrics: A Modern Approach} by J.\,M.\,Wooldridge,
+  Chapter~2 (The Simple Regression Model) — covers OLS derivation and
+  properties in detail.
+\end{explain}
+
+% =====================================================================
+\newpage
+\section*{Cumulative Symbol Glossary}
+\label{sec:glossary}
+\addcontentsline{toc}{section}{Cumulative Symbol Glossary}
+% =====================================================================
+
+\begin{longtable}{@{}p{3.2cm} p{10cm}@{}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+\endhead
+$\theta$ &
+  Generic unknown population parameter. \\
+$\bar{X}$ &
+  Sample mean of a generic random variable $X$. \\
+$\beta_0$ &
+  True (population) intercept of the regression line. \\
+$\beta_1$ &
+  True (population) slope: the change in $E(y\mid x)$ per unit change in $x$. \\
+$\hat{\beta}_0$ &
+  OLS estimator of the intercept $\beta_0$;\;
+  $\hat{\beta}_0 = \bar{y}-\hat{\beta}_1\bar{x}$. \\
+$\hat{\beta}_1$ &
+  OLS estimator of the slope $\beta_1$;\;
+  $\hat{\beta}_1 =
+  \widehat{\operatorname{Cov}}(x,y)/\widehat{\operatorname{Var}}(x)$. \\
+$u_i$ &
+  Error (disturbance) term for observation $i$; captures all factors
+  other than $x_i$ that affect $y_i$. \\
+$x_i$ &
+  Observed value of the regressor (independent variable) for unit $i$
+  (e.g.\ years of education). \\
+$y_i$ &
+  Observed value of the regressand (dependent / endogenous variable)
+  for unit $i$. \\
+$\bar{x}$ &
+  Sample mean of $x$:\; $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$. \\
+$\bar{y}$ &
+  Sample mean of $y$:\; $\bar{y} = \frac{1}{n}\sum_{i=1}^{n} y_i$. \\
+$\mu$ &
+  Population mean (generic). \\
+$\sigma^2$ &
+  Variance of the error term: $\operatorname{Var}(u\mid x)$. \\
+$n$ &
+  Sample size (number of observations). \\
+$S_{xy}$ &
+  Sample covariance of $x$ and $y$:\;
+  $\frac{1}{n}\sum(x_i - \bar{x})(y_i - \bar{y})$. \\
+$S_{xx}$ &
+  Sample variance of $x$:\;
+  $\frac{1}{n}\sum(x_i - \bar{x})^2$. \\
+$\operatorname{plim}$ &
+  Probability limit; the value a random variable converges to in
+  probability as $n\to\infty$. \\
+$E(\cdot)$ &
+  Expected value (population average). \\
+$V(\cdot)$ or $\operatorname{Var}(\cdot)$ &
+  Variance. \\
+$\operatorname{Cov}(\cdot,\cdot)$ &
+  Covariance. \\
+PRF &
+  Population Regression Function: $E(y\mid x) = \beta_0 + \beta_1 x$. \\
+MVUE &
+  Minimum Variance Unbiased Estimator. \\
+BLUE &
+  Best Linear Unbiased Estimator. \\
+\bottomrule
+\end{longtable}
+
+% --- Symbols introduced in Batch 1 ---
+%% All symbols above were introduced in Batch 1.
+
+\end{document}
